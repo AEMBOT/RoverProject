@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>drive_train</name>
+  <name>rover_main</name>
   <version>0.0.1</version>
-  <description>Package used to manage code based around the rover's drivetrain</description>
+  <description>Package used to manage code based around the central rover control systems</description>
 
   <!-- One maintainer tag required, multiple allowed, one person per tag -->
   <!-- Example:  -->

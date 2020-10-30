@@ -1,12 +1,12 @@
 {
     "terminal.integrated.env.osx": {
-        "PYTHONPATH": "${workspaceFolder}/src/drive_train/src",
+        "PYTHONPATH": "${workspaceFolder}/src/rover_main/src",
     },
     "terminal.integrated.env.linux": {
-        "PYTHONPATH": "${workspaceFolder}/src/drive_train/src",
+        "PYTHONPATH": "${workspaceFolder}/src/rover_main/src",
     },
     "terminal.integrated.env.windows": {
-        "PYTHONPATH": "${workspaceFolder}/src/drive_train/src",
+        "PYTHONPATH": "${workspaceFolder}/src/rover_main/src",
     },
     "python.envFile": "${workspaceFolder}/.env",
 }
