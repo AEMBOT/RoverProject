@@ -17,3 +17,7 @@ One can break these files very easily, and since they are used to build the proj
 That being said the [ROS Wiki](http://wiki.ros.org) and its [Tutorial Series](http://wiki.ros.org/ROS/Tutorials) are great places to start. If you run into issues (you will)... google it. Someone has likely had a similar issue on the [ROS Forms](https://answers.ros.org/questions/).
 
 You can also always ask me (Will) for help.
+
+# Useful Resources
+
+[ROS Project Structuring](http://www.artificialhumancompanions.com/structure-python-based-ros-package/)
