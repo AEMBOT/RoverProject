@@ -17,7 +17,7 @@ Therefore,
 **If you don't know what you are doing with the CMake or Package files DO NOT TOUCH.**
 One can break these files very easily, and since they are used to build the project... It won't build.
 
-This project also utilizes python 3 as python 2 is dead, for the shebang lines to execute properly you need to chage the python3 executable in /usr/bin/ to python
+This project also utilizes Python 3 as Python 2 is dead, for the shebang lines to execute properly you need to chage the python3 executable in /usr/bin/ to python
 
 That being said the [ROS Wiki](http://wiki.ros.org) and its [Tutorial Series](http://wiki.ros.org/ROS/Tutorials) are great places to start. If you run into issues (you will)... google it. Someone has likely had a similar issue on the [ROS Forms](https://answers.ros.org/questions/).
 
