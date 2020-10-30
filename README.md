@@ -4,6 +4,9 @@ Repository for AEMBOT's 2020 rover written using ROS and Python
 
 # Installing ROS
 
+**I would highly recomend using a machine dual booted with Ubuntu if you actually want to test any of your modules off rover**
+There are experimental windows builds but your milage may vary
+
 This project makes use of [ROS Noetic](http://wiki.ros.org/noetic) which can be found on the ROS website or at that link
 
 # Tutorials
