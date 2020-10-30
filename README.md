@@ -27,5 +27,4 @@ You can also always ask me (Will) for help.
 
 # Workspace Setup Suggestions
 
-1. This project also utilizes Python 3 as Python 2 is dead, for the shebang lines to execute properly you need to copy the python3 executable in /usr/bin/ to python
-2. I would recomend setting up several virtual desktops to swap between to allow for more workspace
+1. I would recomend setting up several virtual desktops to swap between to allow for more workspace
