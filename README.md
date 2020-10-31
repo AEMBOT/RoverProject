@@ -9,6 +9,8 @@ There are experimental windows builds but your milage may vary
 
 This project makes use of [ROS Noetic](http://wiki.ros.org/noetic/Installation) which can be found on the ROS website or at that link
 
+**Note: Add `<PATH TO rover_ws>/devel/setup.bash` to your .bashrc as well, You will have to call `source ~/.basrc` after every `catkin_make` to get the newly created binaries **
+
 # Tutorials
 
 While the concept of how ROS works isn't that hard to understand and begin to use. The management of modes, messages, services, etc. can be a bit of a pain. 
