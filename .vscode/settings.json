@@ -9,4 +9,5 @@
         "PYTHONPATH": "${workspaceFolder}/src/rover_main/src",
     },
     "python.envFile": "${workspaceFolder}/.env",
+    "C_Cpp.errorSquiggles": "Disabled",
 }

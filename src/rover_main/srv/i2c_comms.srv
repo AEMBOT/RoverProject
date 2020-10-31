@@ -1,0 +1,12 @@
+
+# Bus Information
+int32 bus
+int32 addr
+
+# Data sent to the service as a string eg. "r 1" = Read Pin 1
+# Then parsed into a single 8 bit int
+string data
+---
+
+# Data returned from arduino
+string returnData

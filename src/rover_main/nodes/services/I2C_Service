@@ -1,0 +1,42 @@
+#!/usr/bin/python3
+
+import rospy
+
+from rover_main.srv import i2c_comms
+
+from communication.I2C_Communication import I2C
+
+def on_service_contact(requested_data):
+    """
+    When I2C Data is requested
+    
+    Command Codes:
+        ar = Analog Read
+        dr = Digital Read
+
+    """
+    response_data = I2C.send_data(bus=requested_data.bus,
+                                  addr=requested_data.addr,
+                                  data=requested_data.data)
+
+    return response_data
+
+def start_serivce():
+    """Create new service to proccess data that needs to be sent over the I2C Bus"""
+
+    # Create a new node
+    rospy.init_node("i2c_service")
+
+    # Create new service to handle I2C data requests
+    i2c_service = rospy.Service(name="i2c_service", 
+                                service_class=i2c_comms,
+                                handler=on_service_contact)
+
+    # Log the I2C Serivce is up and waiting
+    rospy.loginfo_once("I2C Service Awaiting Input...")
+
+    # Prevent python from exiting
+    rospy.spin()
+
+if __name__ == "__main__":
+    start_serivce()
