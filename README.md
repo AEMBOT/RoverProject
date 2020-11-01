@@ -9,7 +9,11 @@ There are experimental windows builds but your milage may vary
 
 This project makes use of [ROS Noetic](http://wiki.ros.org/noetic/Installation) which can be found on the ROS website or at that link
 
-**Note: Add `<PATH TO rover_ws>/devel/setup.bash` to your .bashrc as well, You will have to call `source ~/.basrc` after every `catkin_make` to get the newly created binaries**
+**Note: Add `<Path To rover workspace>/devel/setup.bash` to your .bashrc as well, You will have to call `source ~/.basrc` after every `catkin_make` to get the newly created binaries**
+
+Once done move your current directory into the root directory of the rover workspace and run `catkin_make`
+
+Finally to get all the necessary python packges run `pip3 install -r requirements.txt`
 
 # Tutorials
 
