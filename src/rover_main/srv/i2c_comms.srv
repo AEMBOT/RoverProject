@@ -1,6 +1,4 @@
-
-# Bus Information
-int32 bus
+# I2C Device Address
 int32 addr
 
 # Data sent to the service as a string eg. "r 1" = Read Pin 1

@@ -2,16 +2,19 @@
 
 import smbus2
 
+from unittest.mock import Mock
+
 from rover_main.srv import i2c_commsResponse
 
 class I2C:
 
     @staticmethod
-    def send_data(bus: int, addr: int, data: str):
+    def send_data(addr: int, data: str):
         """Send and recieve data from the I2C Device"""
 
         # Connect to the correct I2C Bus
-        bus = smbus2.SMBus(bus)
+        bus = smbus2.SMBus(0)
+      
 
         # Convert the given string into a byte array
         byte_message = I2C.string_to_bytes(data)

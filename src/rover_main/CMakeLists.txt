@@ -159,6 +159,7 @@ include_directories(
 ## in contrast to setup.py, you can choose the destination
 catkin_install_python(PROGRAMS
   nodes/services/I2C_Service
+  scripts/communication/I2C_Service_Test
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
