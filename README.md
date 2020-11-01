@@ -13,6 +13,8 @@ This project makes use of [ROS Noetic](http://wiki.ros.org/noetic/Installation) 
 
 Once done move your current directory into the root directory of the rover workspace and run `catkin_make`
 
+Finally to get all the necessary python packges run `pip3 install -r requirements.txt`
+
 # Tutorials
 
 While the concept of how ROS works isn't that hard to understand and begin to use. The management of modes, messages, services, etc. can be a bit of a pain. 
