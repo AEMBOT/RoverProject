@@ -1,16 +1,22 @@
 #!/usr/bin/python3
 
+"""Script used to test the ControllerService simply prints out the controller state"""
+
 import rospy
 from time import sleep
 
 from rover_client.srv import ControlService
 
 def get_controller_state():
+
+    # Wait for the service to be ready to recieive information
     rospy.wait_for_service("controller_service")
 
+    # Try to call the service and if it fails print out the exception
     try:
         service = rospy.ServiceProxy("controller_service", service_class=ControlService)
 
+        # While ros is running print out the controller state
         while not rospy.is_shutdown():
             print(service())
 

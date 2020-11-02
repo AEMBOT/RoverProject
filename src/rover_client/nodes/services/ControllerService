@@ -12,7 +12,7 @@ def on_service_contact(requested):
     """Called when the service is requested"""
 
     # Announce that a question has been recieived
-    rospy.loginfo_once("Request recievied...")
+    rospy.loginfo("Request recievied...")
 
     return ControlServiceResponse(ControllerUpdater.getCurrentControllerState())
 
@@ -27,11 +27,13 @@ def start_service():
                                        service_class=ControlService,
                                        handler=on_service_contact)
 
+    # Start the controller monitoring thread
     ControllerUpdater.start_controller_monitor()
 
     # Announce that the setup is complete
     rospy.loginfo_once("Awaiting Controller Input...")
 
+    # Wait until the service is terminted
     rospy.spin()
     
 

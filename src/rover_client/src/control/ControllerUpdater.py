@@ -8,8 +8,6 @@ import threading
 
 from rover_main.msg import controllerMap
 
-STOPPING_THREAD = False
-
 # Local dictionary of the state of the controller
 CONTROLLER_DICT = {
 
@@ -40,25 +38,37 @@ CONTROLLER_DICT = {
 }
 
 def threaded_loop(controller, loop):
-    """Threaded async loop"""
+    """Method used to create the thread for handling input"""
+
+    # Set the async loop to the current loop
     asyncio.set_event_loop(loop)
-    print(controller)
+
+    # Print out the controller type
+    rospy.loginfo("Controller Type: " + str(controller))
+
+    # Start loop to get the current controller status
     loop.run_until_complete(get_controller_states(controller))
 
 def start_controller_monitor():
     """Start the asynced thread to register controller inputs"""
     
-    print("Staring Controller Thread...")
+    rospy.loginfo("Staring Controller Thread...")
+
+    # Get the first controller in the InputDevices
     primary_controller = InputDevice(evdev.list_devices()[0])
+
+    # Get the current asyncio loop
     loop = asyncio.get_event_loop()
+
+    # Create and start the asynico thread
     thread = threading.Thread(target=threaded_loop, args=(primary_controller,loop,))
     thread.start()
 
 @asyncio.coroutine
 def get_controller_states(controller):
 
+    # Refernce the global CONTROLLER_DICT to be used locally
     global CONTROLLER_DICT
-    global STOPPING_THREAD
 
     # Events are called when the button is pushed and when it is released
     for event in controller.read_loop():
@@ -167,6 +177,8 @@ def get_controller_states(controller):
             
 
 def getCurrentControllerState():
+    """Takes the values from the dictionary and assigns them to a new controllerMap object"""
+
     controller_state = controllerMap()
 
     # Keys
