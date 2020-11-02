@@ -1,0 +1,22 @@
+#!/usr/bin/python3
+
+import rospy
+from time import sleep
+
+from rover_client.srv import ControlService
+
+def get_controller_state():
+    rospy.wait_for_service("controller_service")
+
+    try:
+        service = rospy.ServiceProxy("controller_service", service_class=ControlService)
+
+        while not rospy.is_shutdown():
+            print(service())
+
+    except rospy.ROSException as e:
+        print("Service Call Failed: %s"%e)
+
+if __name__ == "__main__":
+    get_controller_state()
+       

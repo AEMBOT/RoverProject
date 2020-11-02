@@ -1,4 +1,4 @@
-# Message to send the state of a PS3/Xbox controller
+# Message to send the state of a general controller
 
 # Digital
 
