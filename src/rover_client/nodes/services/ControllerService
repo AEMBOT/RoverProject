@@ -1,5 +1,7 @@
 #!/usr/bin/python3
 
+"""Service called whenever the robot/operator need information regarding the current controller state"""
+
 import rospy
 
 from rover_client.srv import ControlService,ControlServiceResponse
