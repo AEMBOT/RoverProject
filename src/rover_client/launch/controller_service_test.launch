@@ -1,0 +1,4 @@
+<launch>
+    <node name="ControllerService" pkg="rover_client" type="ControllerService"/>
+    <node name="ControllerServiceTester" pkg="rover_client" type="ClientNetworkComms"/>
+</launch>
