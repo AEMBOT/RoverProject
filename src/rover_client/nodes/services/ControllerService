@@ -11,9 +11,6 @@ from control import ControllerUpdater
 def on_service_contact(requested):
     """Called when the service is requested"""
 
-    # Announce that a question has been recieived
-    rospy.loginfo("Request recievied...")
-
     return ControlServiceResponse(ControllerUpdater.getCurrentControllerState())
 
 def start_service():

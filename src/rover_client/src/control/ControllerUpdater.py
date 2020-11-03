@@ -54,8 +54,12 @@ def start_controller_monitor():
     
     rospy.loginfo("Staring Controller Thread...")
 
-    # Get the first controller in the InputDevices
-    primary_controller = InputDevice(evdev.list_devices()[0])
+    try:
+        # Get the first controller in the InputDevices
+        primary_controller = InputDevice(evdev.list_devices()[0])
+    except IndexError:
+        rospy.loginfo("No Controller Detected")
+        return
 
     # Get the current asyncio loop
     loop = asyncio.get_event_loop()

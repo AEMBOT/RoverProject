@@ -9,6 +9,7 @@ project(rover_client)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
   rospy
+  roscpp
   std_msgs
   message_generation
 )
@@ -135,6 +136,14 @@ include_directories(
 ## The recommended prefix ensures that target names across packages don't collide
 # add_executable(${PROJECT_NAME}_node src/rover_client_node.cpp)
 
+add_executable(ControllerPublisher nodes/ControllerPublisher.cpp)
+target_link_libraries(ControllerPublisher ${catkin_LIBRARIES})
+add_dependencies(ControllerPublisher ${catkin_EXPORTED_TARGETS})
+
+add_executable(CPP_ControllerTest scripts/ControllerTester.cpp)
+target_link_libraries(CPP_ControllerTest ${catkin_LIBRARIES})
+add_dependencies(CPP_ControllerTest ${catkin_EXPORTED_TARGETS})
+
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
 ## target back to the shorter version for ease of user use
@@ -160,7 +169,6 @@ include_directories(
 ## Mark executable scripts (Python etc.) for installation
 ## in contrast to setup.py, you can choose the destination
 catkin_install_python(PROGRAMS
-  nodes/ClientNetworkComms
   nodes/services/ControllerService
   scripts/ControllerTopicTester
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
