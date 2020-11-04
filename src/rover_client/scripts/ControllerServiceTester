@@ -14,7 +14,7 @@ def get_controller_state():
 
     # Try to call the service and if it fails print out the exception
     try:
-        service = rospy.ServiceProxy("controller_service", service_class=ControlService)
+        service = rospy.ServiceProxy("controller_service", service_class=ControlService, persistent=True)
 
         # While ros is running print out the controller state
         while not rospy.is_shutdown():

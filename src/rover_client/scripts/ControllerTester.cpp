@@ -7,7 +7,6 @@
  *  Called whenever the controller topic stream is updated
  */
 void controllerStreamCallback(const rover_main::controllerMap msg){
-    ROS_INFO("BRUH");
     ROS_INFO("Controller State: [%f]", (float)msg.Joystick_LeftX);
 }
 

@@ -9,12 +9,12 @@ int main(int argc, char **argv){
 
 
     ros::NodeHandle n;
-    ros::ServiceClient client = n.serviceClient<rover_client::ControlService>("controller_service");
+    ros::ServiceClient client = n.serviceClient<rover_client::ControlService>("controller_service", true);
 
     rover_client::ControlService srv;
 
     ros::Publisher controller_publisher = n.advertise<rover_main::controllerMap>("rover_control_stream", 1000);
-    ros::Rate loop_rate(100);
+    ros::Rate loop_rate(250);
 
     int loop_count = 0;
     while (ros::ok()){

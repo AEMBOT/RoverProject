@@ -6,17 +6,12 @@
         "PYTHONPATH": "${workspaceFolder}/src/rover_main/src",
     },
     "terminal.integrated.env.windows": {
-        "PYTHONPATH": "${workspaceFolder}/src/rover_main/src",
+        "PYTHONPATH": "${workspaceFolder}\\src\\rover_main\\src:${workspaceFolder}\\src\\rover_client\\src",
     },
     "python.envFile": "${workspaceFolder}/.env",
     "python.autoComplete.extraPaths": [
-        "/home/will/Documents/ROS/rover_ws/devel/lib/python3/dist-packages",
-        "/home/will/Documents/ROS/tutorial_ws/devel/lib/python3/dist-packages",
-        "/home/will/Documents/ROS/turtlebot3_ws/devel/lib/python3/dist-packages",
-        "/opt/ros/noetic/lib/python3/dist-packages",
-        "/home/will/Documents/Machine Learning/Tensorflow-API/models/research",
-        "/home/will/Documents/Machine Learning/Tensorflow-API/models/research/slim",
-        "/home/will/Documents/ROS/rover_ws/src/rover_main/src",
-        "/home/will/Documents/ROS/rover_ws/src/rover_client/src"
+        "C:\\opt\\workspaces\\RoverProject\\src\\rover_main\\src",
+        "C:\\opt\\workspaces\\RoverProject\\src\\rover_client\\src"
     ],
+    "ros.distro": "noetic",
 }
