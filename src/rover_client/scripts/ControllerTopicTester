@@ -6,13 +6,12 @@ from rover_main.msg import controllerMap
 data_array = []
 
 def subscriber_callback(data):
-    data_array.append(data)
-    print(len(data_array))
+    print(data.Joystick_LeftX)
 
 if __name__ == "__main__":
     rospy.init_node("controller_topic_tester")
 
-    subscriber = rospy.Subscriber("rover_control_stream", data_class=controllerMap, callback=subscriber_callback, queue_size=1)
+    subscriber = rospy.Subscriber("rover_control_stream", data_class=controllerMap, callback=subscriber_callback, queue_size=1000)
 
     rospy.spin()
 
