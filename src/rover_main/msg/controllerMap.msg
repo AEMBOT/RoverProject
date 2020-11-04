@@ -8,10 +8,6 @@ bool Key_Square
 bool Key_Circle
 bool Key_Triangle
 
-# Option Buttons
-bool Key_Select
-bool Key_Start
-
 # D-Pad
 bool Dpad_Left
 bool Dpad_Right
@@ -21,10 +17,6 @@ bool Dpad_Down
 # Bumpers
 bool Bumper_Left
 bool Bumper_Right
-
-# Joysticks
-bool Key_LeftJoystick
-bool Key_RightJoystick
 
 # Analog
 

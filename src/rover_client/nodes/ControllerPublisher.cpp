@@ -13,12 +13,13 @@ int main(int argc, char **argv){
 
     rover_client::ControlService srv;
 
-    ros::Publisher controller_publisher = n.advertise<rover_main::controllerMap>("rover_control_stream", 1);
-    ros::Rate loop_rate(250);
+    ros::Publisher controller_publisher = n.advertise<rover_main::controllerMap>("rover_control_stream", 1000);
+    ros::Rate loop_rate(100);
 
+    int loop_count = 0;
     while (ros::ok()){
         if(client.call(srv)){
-            ROS_INFO("Publishing Data...");
+            ROS_INFO("%i", loop_count);
             controller_publisher.publish(srv.response.controllerState);
         }
         else{
@@ -26,6 +27,7 @@ int main(int argc, char **argv){
             return 1;
         }
         loop_rate.sleep();
+        ++loop_count;
     }
    
     return 0;

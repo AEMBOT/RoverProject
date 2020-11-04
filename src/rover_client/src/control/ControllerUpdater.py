@@ -1,8 +1,6 @@
 import rospy
-import asyncio
 
-import evdev
-from evdev import InputDevice, ecodes
+import pygame
 
 import threading
 
@@ -16,16 +14,12 @@ CONTROLLER_DICT = {
     "Key_Square" : False,
     "Key_Circle" : False,
     "Key_Triangle" : False,
-    "Key_Select" : False,
-    "Key_Start" : False,
     "Key_Dpad_Left" : False,
     "Key_Dpad_Right" : False,
     "Key_Dpad_Up" : False,
     "Key_Dpad_Down" : False,
     "Key_Bumper_Left" : False,
     "Key_Bumper_Right" : False,
-    "Key_Joystick_Left" : False,
-    "Key_Joystick_Right" : False,
 
     # Analog values
     "Joystick_LeftX" : 0.0,
@@ -37,147 +31,98 @@ CONTROLLER_DICT = {
 
 }
 
-def threaded_loop(controller, loop):
-    """Method used to create the thread for handling input"""
-
-    # Set the async loop to the current loop
-    asyncio.set_event_loop(loop)
-
-    # Print out the controller type
-    rospy.loginfo("Controller Type: " + str(controller))
-
-    # Start loop to get the current controller status
-    loop.run_until_complete(get_controller_states(controller))
 
 def start_controller_monitor():
     """Start the asynced thread to register controller inputs"""
     
     rospy.loginfo("Staring Controller Thread...")
+       
+    # Create and start the asynico thread
+    thread = threading.Thread(target=get_controller_states, args=())
+    thread.start()
+
+def get_controller_states():
+
+    # Create the pygame backend to manage the controller
+    pygame.display.init()
+    pygame.joystick.init()
 
     try:
         # Get the first controller in the InputDevices
-        primary_controller = InputDevice(evdev.list_devices()[0])
-    except IndexError:
-        rospy.loginfo("No Controller Detected")
+        controller = pygame.joystick.Joystick(0)
+    except Exception as e:
+        rospy.loginfo("No Controller Detected: %s"%e)
         return
-
-    # Get the current asyncio loop
-    loop = asyncio.get_event_loop()
-
-    # Create and start the asynico thread
-    thread = threading.Thread(target=threaded_loop, args=(primary_controller,loop,))
-    thread.start()
-
-@asyncio.coroutine
-def get_controller_states(controller):
 
     # Refernce the global CONTROLLER_DICT to be used locally
     global CONTROLLER_DICT
 
     # Events are called when the button is pushed and when it is released
-    for event in controller.read_loop():
+    while not rospy.is_shutdown():
 
-        # If ROS was shutdown break out of the loop and exit
-        if rospy.is_shutdown():
-            break
+        # X / A
+        CONTROLLER_DICT["Key_X"] = bool(controller.get_button(0))
 
-        # If a normal button is pressed
-        if event.type == ecodes.EV_KEY:
+        # Circle / B
+        CONTROLLER_DICT["Key_Circle"] = bool(controller.get_button(1))
 
-            # X / A
-            if event.code == 304:
-                CONTROLLER_DICT["Key_X"] = not CONTROLLER_DICT["Key_X"]
+        # Triangle / X
+        CONTROLLER_DICT["Key_Triangle"] = bool(controller.get_button(2))
 
-            # Circle / B
-            if event.code == 305:
-                CONTROLLER_DICT["Key_Circle"] = not CONTROLLER_DICT["Key_Circle"]
+        # Square / Y
+        CONTROLLER_DICT["Key_Square"] = bool(controller.get_button(3))
+        
+        # Left Bumper
+        CONTROLLER_DICT["Key_Bumper_Left"] = bool(controller.get_button(4))
 
-            # Triangle / X
-            if event.code == 307:
-                CONTROLLER_DICT["Key_Triangle"] = not CONTROLLER_DICT["Key_Triangle"]
+        # Right Bumper
+        CONTROLLER_DICT["Key_Bumper_Right"] = bool(controller.get_button(5))
 
-            # Square / Y
-            if event.code == 308:
-                CONTROLLER_DICT["Key_Square"] = not CONTROLLER_DICT["Key_Square"]
-            
-            # Left Bumper
-            if event.code == 310:
-                CONTROLLER_DICT["Key_Bumper_Left"] = not CONTROLLER_DICT["Key_Bumper_Left"]
+        # Dpad-Parser (Left / Right)
+        if controller.get_hat(0)[0] > 0.2:
+            CONTROLLER_DICT["Key_Dpad_Right"] = True
+            CONTROLLER_DICT["Key_Dpad_Left"] = False
+        elif controller.get_hat(0)[0] < -0.2:
+            CONTROLLER_DICT["Key_Dpad_Right"] = False
+            CONTROLLER_DICT["Key_Dpad_Left"] = True
+        else:
+            CONTROLLER_DICT["Key_Dpad_Right"] = False
+            CONTROLLER_DICT["Key_Dpad_Left"] = False
 
-            # Right Bumper
-            if event.code == 311:
-                CONTROLLER_DICT["Key_Bumper_Right"] = not CONTROLLER_DICT["Key_Bumper_Right"]
+        # Dpad-Parser (Up / Down)
+        if controller.get_hat(0)[1] > 0.2:
+            CONTROLLER_DICT["Key_Dpad_Up"] = True
+            CONTROLLER_DICT["Key_Dpad_Down"] = False
+        elif controller.get_hat(0)[1] < -0.2:
+            CONTROLLER_DICT["Key_Dpad_Up"] = False
+            CONTROLLER_DICT["Key_Dpad_Down"] = True
+        else:
+            CONTROLLER_DICT["Key_Dpad_Up"] = False
+            CONTROLLER_DICT["Key_Dpad_Down"] = False
 
-            # Select
-            if event.code == 314:
-                CONTROLLER_DICT["Key_Select"] = not CONTROLLER_DICT["Key_Select"]
 
-            # Start
-            if event.code == 315:
-                CONTROLLER_DICT["Key_Start"] = not CONTROLLER_DICT["Key_Start"]
 
-            # Joystick Left Button
-            if event.code == 317:
-                CONTROLLER_DICT["Key_Joystick_Left"] = not CONTROLLER_DICT["Key_Joystick_Left"]
+        # Left Joystick X
+        CONTROLLER_DICT["Joystick_LeftX"] = controller.get_axis(0)
+        
 
-            # Joystick Right Button
-            if event.code == 317:
-                CONTROLLER_DICT["Key_Joystick_Right"] = not CONTROLLER_DICT["Key_Joystick_Right"]
+        # Left Joystick Y
+        CONTROLLER_DICT["Joystick_LeftY"] = controller.get_axis(1)
 
-        # If a joystick is moved / dpad is used
-        if event.type == ecodes.EV_ABS:
+        # Right Joystick X
+        CONTROLLER_DICT["Joystick_RightX"] = controller.get_axis(2)
 
-            # Left Joystick X
-            if event.code == 0:
-                CONTROLLER_DICT["Joystick_LeftX"] = convert_joystick(event.value)
+        # Right Joystick Y
+        CONTROLLER_DICT["Joystick_RightY"] = controller.get_axis(3)
 
-            # Left Joystick Y
-            if event.code == 1:
-                CONTROLLER_DICT["Joystick_LeftY"] = -convert_joystick(event.value)
+        # Right Trigger
+        CONTROLLER_DICT["Trigger_Right"] = convert_trigger(controller.get_axis(4))
 
-            # Right Joystick X
-            if event.code == 3:
-                CONTROLLER_DICT["Joystick_RightX"] = convert_joystick(event.value)
+        # Left Trigger
+        CONTROLLER_DICT["Trigger_Left"] = convert_trigger(controller.get_axis(5))
 
-            # Right Joystick Y
-            if event.code == 4:
-                CONTROLLER_DICT["Joystick_RightY"] = -convert_joystick(event.value)
-
-            # Right Trigger
-            if event.code == 9:
-                CONTROLLER_DICT["Trigger_Right"] = convert_trigger(event.value)
-
-            # Left Trigger
-            if event.code == 10:
-                CONTROLLER_DICT["Trigger_Left"] = convert_trigger(event.value)
-
-            # X Dpad axis
-            if event.code == 16:
-
-                # Convert the analog values to digital
-                if event.value < -0.2:
-                    CONTROLLER_DICT["Key_Dpad_Left"] = False
-                    CONTROLLER_DICT["Key_Dpad_Right"] = True
-                elif event.value > 0.2:
-                    CONTROLLER_DICT["Key_Dpad_Right"] = False
-                    CONTROLLER_DICT["Key_Dpad_Left"] = True
-                else:
-                    CONTROLLER_DICT["Key_Dpad_Left"] = False
-                    CONTROLLER_DICT["Key_Dpad_Right"] = False
-            
-            # Y Dpad axis
-            if event.code == 17:
-
-                # Convert the analog values to digital
-                if event.value < -0.2:
-                    CONTROLLER_DICT["Key_Dpad_Down"] = False
-                    CONTROLLER_DICT["Key_Dpad_Up"] = True
-                elif event.value > 0.2:
-                    CONTROLLER_DICT["Key_Dpad_Up"] = False
-                    CONTROLLER_DICT["Key_Dpad_Down"] = True
-                else:
-                    CONTROLLER_DICT["Key_Dpad_Down"] = False
-                    CONTROLLER_DICT["Key_Dpad_Up"] = False
+        # Register new events
+        pygame.event.pump()
             
 
 def getCurrentControllerState():
@@ -191,10 +136,6 @@ def getCurrentControllerState():
     controller_state.Key_Circle = CONTROLLER_DICT["Key_Circle"]
     controller_state.Key_Triangle = CONTROLLER_DICT["Key_Triangle"]
 
-    # Modifier Keys
-    controller_state.Key_Select = CONTROLLER_DICT["Key_Select"]
-    controller_state.Key_Start = CONTROLLER_DICT["Key_Start"]
-
     # Dpad
     controller_state.Dpad_Up = CONTROLLER_DICT["Key_Dpad_Up"]
     controller_state.Dpad_Down = CONTROLLER_DICT["Key_Dpad_Down"]
@@ -204,10 +145,6 @@ def getCurrentControllerState():
     # Bumpers
     controller_state.Bumper_Left = CONTROLLER_DICT["Key_Bumper_Left"]
     controller_state.Bumper_Right = CONTROLLER_DICT["Key_Bumper_Right"]
-
-    # Joystick Buttons
-    controller_state.Key_LeftJoystick = CONTROLLER_DICT["Key_Joystick_Left"]
-    controller_state.Key_RightJoystick = CONTROLLER_DICT["Key_Joystick_Right"]
 
     # Analog
     controller_state.Joystick_LeftX = CONTROLLER_DICT["Joystick_LeftX"]
@@ -221,10 +158,8 @@ def getCurrentControllerState():
 
     return controller_state
 
-def convert_joystick(value):
-    """Convert the joystick to ranges from -1 to 1"""
-    return (value/32_768)
-
 def convert_trigger(value):
     """Convert the trigger to ranges from 0 to 1"""
-    return (value/255)
+    if value < 0:
+        value = 0
+    return (value)
