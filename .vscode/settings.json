@@ -10,8 +10,9 @@
     },
     "python.envFile": "${workspaceFolder}/.env",
     "python.autoComplete.extraPaths": [
-        "C:\\opt\\workspaces\\RoverProject\\src\\rover_main\\src",
-        "C:\\opt\\workspaces\\RoverProject\\src\\rover_client\\src"
+        "C:/opt/workspaces/RoverProject/devel\\lib/site-packages",
+        "c:\\opt\\ros\\noetic\\x64\\lib/site-packages",
+        "C:\\opt\\ros\\noetic\\x64\\Lib\\site-packages"
     ],
     "ros.distro": "noetic",
 }

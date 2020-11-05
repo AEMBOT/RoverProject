@@ -1,0 +1,30 @@
+#!/usr/bin/python3
+
+"""Used to enable or disable the rover"""
+
+import rospy
+
+# Services / Messages
+from rover_main.srv import RoverStatus, RobotStatusResponse
+
+# Source files
+from rover_management.RoverStateManager import RoverControlState
+
+def on_service_contact(data):
+    """Called whenever the service is called"""
+
+    # Set the enabled status to whatever the user set
+    RoverControlState.set_enabled_state(data.roverEnabled)
+
+def init_service():
+
+    # Init the service node
+    rospy.init_node("rover_state")
+
+    # Init the service itself
+    service = rospy.Service("rover_state_service", service_class=RoverStatus, handler=on_service_contact)
+    
+    rospy.spin()
+
+if __name__ == "__main__":
+    init_service()
