@@ -67,10 +67,10 @@ def get_controller_states():
         CONTROLLER_DICT["Key_Circle"] = bool(controller.get_button(1))
 
         # Triangle / X
-        CONTROLLER_DICT["Key_Triangle"] = bool(controller.get_button(2))
+        CONTROLLER_DICT["Key_Triangle"] = bool(controller.get_button(3))
 
         # Square / Y
-        CONTROLLER_DICT["Key_Square"] = bool(controller.get_button(3))
+        CONTROLLER_DICT["Key_Square"] = bool(controller.get_button(2))
         
         # Left Bumper
         CONTROLLER_DICT["Key_Bumper_Left"] = bool(controller.get_button(4))
@@ -110,16 +110,16 @@ def get_controller_states():
         CONTROLLER_DICT["Joystick_LeftY"] = controller.get_axis(1)
 
         # Right Joystick X
-        CONTROLLER_DICT["Joystick_RightX"] = controller.get_axis(2)
+        CONTROLLER_DICT["Joystick_RightX"] = controller.get_axis(3)
 
         # Right Joystick Y
-        CONTROLLER_DICT["Joystick_RightY"] = controller.get_axis(3)
+        CONTROLLER_DICT["Joystick_RightY"] = controller.get_axis(4)
 
         # Right Trigger
-        CONTROLLER_DICT["Trigger_Right"] = convert_trigger(controller.get_axis(4))
+        CONTROLLER_DICT["Trigger_Right"] = convert_trigger(controller.get_axis(5))
 
         # Left Trigger
-        CONTROLLER_DICT["Trigger_Left"] = convert_trigger(controller.get_axis(5))
+        CONTROLLER_DICT["Trigger_Left"] = convert_trigger(controller.get_axis(2))
 
         # Register new events
         pygame.event.pump()
