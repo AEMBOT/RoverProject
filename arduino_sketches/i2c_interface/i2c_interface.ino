@@ -60,12 +60,23 @@ void sendData()
  * 
  * return: The value to return, returns -1 if no data was returned
  */
-double parseCommand(String commandStr)
+String parseCommand(String commandStr)
 {
+  // Pin Number to read / write data to
+  int pinNumber = 0;
+  
+  // Check to see if there is another space after the first one
+  if (commandStr.lastIndexOf(' ') < 3){
 
-  // Split the command string from one past the first space to the end of the string and convert the string to an int
-  int pinNumber = commandStr.substring(commandStr.indexOf(' ') + 1, commandStr.length() - 1).toInt();
+    // Split the command string from one past the first space to the end of the string and convert the string to an int
+    pinNumber = commandStr.substring(commandStr.indexOf(' ') + 1, commandStr.length() - 1).toInt();
+  }
 
+  // If there is split differently to only get the pin
+  else{
+    pinNumber = commandStr.substring(commandStr.indexOf(' ') + 1, commandStr.indexOf(' ', commandStr.indexOf(' ') + 1) - 1).toInt();
+  }
+  
   // Get the fist two characters from the command string that represent the command type
   String commandType = commandStr.substring(0, 1);
 
@@ -75,18 +86,34 @@ double parseCommand(String commandStr)
 
     // Read the data from a digital pin
     pinMode(pinNumber, INPUT);
-    return (int) digitalRead(pinNumber);
+    return String(digitalRead(pinNumber));
   }
 
   else if (commandType.equals("ar"))
   {
-
     // Read the data from an analog pin
-    return analogRead(pinNumber);
+    return String(analogRead(pinNumber));
   }
 
+  // If we are trying to preform a digital write
   else if (commandType.equals("dw"))
   {
-    // Needs interface re-design, not implementing yet as we may not need it
+    // Get one index past the second space to the end of the string
+    int value = commandStr.substring(commandStr.indexOf(' ', commandStr.indexOf(' ') + 1) + 1, commandStr.length() - 1).toInt();
+
+    // Set the pin mode to output so we can write to it
+    pinMode(pinNumber, OUTPUT);
+
+    // If a LOW write is sent
+    if (value == 0){
+      digitalWrite(pinNumber, LOW);
+    }
+    else if(value == 1){
+      digitalWrite(pinNumber, HIGH);
+    }
+    else{
+      return "invalid write value";
+    }
+    return "ok";
   }
 }
