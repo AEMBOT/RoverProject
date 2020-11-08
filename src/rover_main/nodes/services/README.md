@@ -13,6 +13,7 @@ All code regarding services, specified bellow are service parameter calls
     To read digital data from a pin on an arduino: `dr <pin>`<br>
     To read analog data from a pin on an arduino: `ar <pin>`<br>
     To write digital data to a pin on an arduino: `dw <pin> <value>` (0 or 1)<br>
+    To write analog/PWM data to a pin on an arduino: `aw <pin> <value>`<br>
     <br>
 
 **Adafruit 16-Channel PWM/Servo Driver:**<br>

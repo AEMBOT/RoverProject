@@ -68,12 +68,20 @@ String parseCommand(String commandStr)
   // Check to see if there is another space after the first one
   if (commandStr.lastIndexOf(' ') < 3){
 
+    // If there is no space something is wrong, return
+    if(commandStr.indexOf(' ') == -1){
+      return "Invalid command structure";
+    }
+
     // Split the command string from one past the first space to the end of the string and convert the string to an int
     pinNumber = commandStr.substring(commandStr.indexOf(' ') + 1, commandStr.length() - 1).toInt();
   }
 
   // If there is split differently to only get the pin
   else{
+    if(commandStr.indexOf(' ') == -1){
+      return "Invalid command structure";
+    }
     pinNumber = commandStr.substring(commandStr.indexOf(' ') + 1, commandStr.indexOf(' ', commandStr.indexOf(' ') + 1) - 1).toInt();
   }
   
@@ -115,5 +123,23 @@ String parseCommand(String commandStr)
       return "invalid write value";
     }
     return "ok";
+  }
+
+  else if (commandType.equals("aw")){
+
+    // Get one index past the second space to the end of the string to get the input value
+    int value = commandStr.substring(commandStr.indexOf(' ', commandStr.indexOf(' ') + 1) + 1, commandStr.length() - 1).toInt();
+
+    // Set the pin mode to output so we can write to it
+    pinMode(pinNumber, OUTPUT);
+
+    // Write the PWM value to a pin
+    analogWrite(pinNumber, value)
+
+    return "ok";
+  }
+  // If none of those were triggered the command didnt execute
+  else{
+    return "Invalid command";
   }
 }
