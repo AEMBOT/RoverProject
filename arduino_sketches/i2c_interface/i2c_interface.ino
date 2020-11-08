@@ -58,7 +58,7 @@ void sendData()
 /**
  * Parse and execute the string constructed from the I2C Response
  * 
- * return: The value to return, returns -1 if no data was returned
+ * return: The value to return ("ok" if none), returns an error if something unexpected occurred
  */
 String parseCommand(String commandStr)
 {
