@@ -33,7 +33,7 @@ def on_service_contact(requested_data):
 
             return i2c_commsResponse(str(e))
         
-    # Representresponse_received controller
+    # Represent response_received controller
     elif "ada_pwm" in requested_data.data.strip():
         rospy.loginfo_once(requested_data.data.strip())
 
