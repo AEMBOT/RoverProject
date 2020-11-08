@@ -65,6 +65,7 @@ String parseCommand(String commandStr)
   // Pin Number to read / write data to
   int pinNumber = 0;
   
+  
   // Check to see if there is another space after the first one
   if (commandStr.lastIndexOf(' ') < 3){
 
@@ -72,9 +73,11 @@ String parseCommand(String commandStr)
     if(commandStr.indexOf(' ') == -1){
       return "Invalid command structure";
     }
+    
+    int firstDelimIndex = commandStr.indexOf(' ');
 
     // Split the command string from one past the first space to the end of the string and convert the string to an int
-    pinNumber = commandStr.substring(commandStr.indexOf(' ') + 1, commandStr.length() - 1).toInt();
+    pinNumber = commandStr.substring(firstDelimIndex + 1, commandStr.length() - 1).toInt();
   }
 
   // If there is split differently to only get the pin
@@ -82,7 +85,11 @@ String parseCommand(String commandStr)
     if(commandStr.indexOf(' ') == -1){
       return "Invalid command structure";
     }
-    pinNumber = commandStr.substring(commandStr.indexOf(' ') + 1, commandStr.indexOf(' ', commandStr.indexOf(' ') + 1) - 1).toInt();
+    
+    int firstDelimIndex = commandStr.indexOf(' ');
+    
+    // Get only the middle number by substringing from the first space to the second space
+    pinNumber = commandStr.substring(firstDelimIndex + 1, commandStr.indexOf(' ', firstDelimIndex + 1) - 1).toInt();
   }
   
   // Get the fist two characters from the command string that represent the command type
