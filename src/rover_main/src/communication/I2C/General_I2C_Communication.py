@@ -25,12 +25,12 @@ class I2C:
                                 data=byte_message)
 
         # Read the response bytes
-        response_recieved = bus.read_i2c_block_data(i2c_addr=addr,
+        response_received = bus.read_i2c_block_data(i2c_addr=addr,
                                                     register=0x00,
                                                     length=15)
 
         # Convert those bytes back into a string and submit that as the service response
-        response_string = I2C.bytes_to_string(response_recieved)
+        response_string = I2C.bytes_to_string(response_received)
         return i2c_commsResponse(response_string)
 
 

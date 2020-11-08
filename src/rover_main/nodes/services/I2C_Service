@@ -33,7 +33,7 @@ def on_service_contact(requested_data):
 
             return i2c_commsResponse(str(e))
         
-    # Represents an adafruit WPM controller
+    # Representresponse_received controller
     elif "ada_pwm" in requested_data.data.strip():
         rospy.loginfo_once(requested_data.data.strip())
 
@@ -43,7 +43,7 @@ def on_service_contact(requested_data):
         
     
 
-def start_serivce():
+def start_service():
     """Create new service to proccess data that needs to be sent over the I2C Bus"""
 
     # Create a new node
@@ -65,4 +65,4 @@ def start_serivce():
     rospy.spin()
 
 if __name__ == "__main__":
-    start_serivce()
+    start_service()
