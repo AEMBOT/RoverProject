@@ -22,5 +22,4 @@ All code regarding services, specified bellow are service parameter calls
     To set the angle of a servo: `ada_pwm set_angle <channel_num> <angle>`<br>
     To set the range of movment of a servo: `ada_pwm set_angle_range <channel_num> <angle>`<br>
     To set the throttle of a motor: `ada_pwm set_power <channel_num> <power>`<br>
-    **The Address for this device is 0x40 (64), however it doesnt really matter what you send to the service as the device address**
-
+    **The Address for this device is 0x40 (64), however it doesn't really matter what you send to the service as the device address**
