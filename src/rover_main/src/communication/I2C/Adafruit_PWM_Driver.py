@@ -56,62 +56,43 @@ class AdafruitDriver:
         # Split the passed command to an array
         spilt_command = command.strip().split(" ")
 
-        # Get the second item in the command as that is the action we are taking
-        # Set the board frequency
-        if spilt_command[1] == "set_freq":
-            try:
+        try:
+
+            # Get the second item in the command as that is the action we are taking
+            # Set the board frequency
+            if spilt_command[1] == "set_freq":
                 self.set_board_freq(frequency=int(spilt_command[2]))
                 return i2c_commsResponse("ok")
-            
-            # If an exception occured return that as the response, if not send 'ok'
-            except Exception as e:
-                return i2c_commsResponse("Exception Caught: " + str(e))
-
-        # Set the PWM range for servos
-        elif spilt_command[1] == "set_range":
-            try:
+                
+            # Set the PWM range for servos
+            elif spilt_command[1] == "set_range":
                 self.set_pwm_range(channel=int(spilt_command[2]),
-                                min_pulse=int(spilt_command[3]),
-                                max_pulse=int(spilt_command[4]))
+                                   min_pulse=int(spilt_command[3]),
+                                   max_pulse=int(spilt_command[4]))
                 return i2c_commsResponse("ok")
 
-            # If an exception occured return that as the response, if not send 'ok'
-            except Exception as e:
-                return i2c_commsResponse("Exception Caught: " + str(e))
-        
-        # Set the angle of a servo
-        elif spilt_command[1] == "set_angle":
-            try:
+            # Set the angle of a servo
+            elif spilt_command[1] == "set_angle":
                 self.set_angle(channel=int(spilt_command[2]),
-                            angle=float(spilt_command[3]))
+                               angle=float(spilt_command[3]))
                 return i2c_commsResponse("ok")
 
-            # If an exception occured return that as the response, if not send 'ok'
-            except Exception as e:
-                return i2c_commsResponse("Exception Caught: " + str(e))
-
-        # Set the range of the servo in degrees
-        elif spilt_command[1] == "set_angle_range":
-            try:
+            # Set the range of the servo in degrees
+            elif spilt_command[1] == "set_angle_range":
                 self.set_angle_range(channel=int(spilt_command[2]),
-                                    angle=float(spilt_command[3]))
-                return i2c_commsResponse("ok")
-            
-            # If an exception occured return that as the response, if not send 'ok' 
-            except Exception as e:
-                return i2c_commsResponse("Exception Caught: " + str(e))
-        
-        # Set the power of a motor ranging from 1 to -1
-        elif spilt_command[1] == "set_power":
-            try:
-                self.set_power(channel=int(spilt_command[2]),
-                            power=float(spilt_command[3]))
+                                     angle=float(spilt_command[3]))
                 return i2c_commsResponse("ok")
 
-            # If an exception occured return that as the response, if not send 'ok'
-            except Exception as e:
-                return i2c_commsResponse("Exception Caught: " + str(e))
-    
+            # Set the power of a motor ranging from 1 to -1
+            elif spilt_command[1] == "set_power":
+                self.set_power(channel=int(spilt_command[2]),
+                               power=float(spilt_command[3]))
+                return i2c_commsResponse("ok")
+
+        # If an exception occurred return that as the response, if not send 'ok'
+        except Exception as e:
+            return i2c_commsResponse("Exception Caught: " + str(e))
+
     def set_board_freq(self, frequency):
         """Set the acting frequency of the board"""
 
