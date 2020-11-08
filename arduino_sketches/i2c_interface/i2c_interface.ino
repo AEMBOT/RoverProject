@@ -22,13 +22,13 @@ void loop(){ /* Loop forever with a 200ms delay*/ delay(200); }
 /**
  * Called when data is received from the master
  * 
- * byteCont: Number of bytes received
+ * byteCount: Number of bytes received
  */
-void receiveData(int bytyeCount)
+void receiveData(int byteCount)
 {
 
   String commandStr = "";
-  // Loop through all avialiable bytes
+  // Loop through all available bytes
   while (Wire.available())
   {
 
