@@ -4,18 +4,16 @@ Repository for AEMBOT's 2020 rover written using ROS and Python
 
 # Installing ROS
 
-**I would highly recomend using a machine dual booted with Ubuntu if you actually want to test any of your modules off rover**
-There are experimental windows builds but your milage may vary
+**I would highly recommend using a machine dual booted with Ubuntu. However with that said make sure that machine returns a reasonably low ping**
+If it its average is > 300ms check in windows, if that is lower install for Windows
 
 This project makes use of [ROS Noetic](http://wiki.ros.org/noetic/Installation) which can be found on the ROS website or at that link
 
+After the install add the following to an environment variable named PYTHONPATH
+1. C:\opt\workspaces\RoverProject\src\rover_client\src
+2. C:\opt\workspaces\RoverProject\src\rover_main\src
 
-**Note: Add `<Path To rover workspace>/devel/setup.bash` to your .bashrc as well, You will have to call `source ~/.basrc` after every `catkin_make` to get the newly created binaries**
-
-Once done move your current directory into the root directory of the rover workspace and run `catkin_make`
-
-Finally to get all the necessary python packges run `pip3 install -r requirements.txt`
-=======
+You will also need to add the rover's hostname/ip combo to your hosts file
 
 # Tutorials
 
@@ -35,6 +33,4 @@ You can also always ask me (Will) for help.
 
 # Workspace Setup Suggestions
 
-1. I would recomend setting up several virtual desktops to swap between to allow for more workspace
-2. Add the path to /rover_main/src to your python path to allow terminals outside of VScode to run the files
-=======
+1. I would recommend setting up several virtual desktops to swap between to allow for more workspace
