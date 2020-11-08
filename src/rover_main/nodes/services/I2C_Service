@@ -58,7 +58,7 @@ def start_service():
                                 service_class=i2c_comms,
                                 handler=on_service_contact)
 
-    # Log the I2C Serivce is up and waiting
+    # Log the I2C Service is up and waiting
     rospy.loginfo_once("I2C Service Awaiting Input...")
 
     # Prevent python from exiting
