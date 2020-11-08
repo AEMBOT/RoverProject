@@ -9,7 +9,7 @@ If it its average is > 300ms check in windows, if that is lower install for Wind
 
 This project makes use of [ROS Noetic](http://wiki.ros.org/noetic/Installation) which can be found on the ROS website or at that link
 
-After the install add the following to an environment variable named PYTHONPATH
+After the install add the following to an environment variable named PYTHONPATH (if you're on Windows):
 1. C:\opt\workspaces\RoverProject\src\rover_client\src
 2. C:\opt\workspaces\RoverProject\src\rover_main\src
 
