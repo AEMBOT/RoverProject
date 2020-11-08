@@ -1,4 +1,4 @@
-# In refernece to: https://www.adafruit.com/product/815
+# In reference to: https://www.adafruit.com/product/815
 
 # Used to get IO information form the board
 import busio
