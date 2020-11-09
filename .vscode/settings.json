@@ -9,4 +9,12 @@
         "PYTHONPATH": "${workspaceFolder}/src/rover_main/src",
     },
     "python.envFile": "${workspaceFolder}/.env",
+    "C_Cpp.errorSquiggles": "Disabled",
+    "python.autoComplete.extraPaths": [
+        "C:/opt/workspaces/RoverProject/devel\\lib/site-packages",
+        "c:\\opt\\ros\\noetic\\x64\\lib/site-packages",
+        "c:\\opt\\ros\\noetic\\x64\\Lib\\site-packages",
+        "C:\\opt\\workspaces\\RoverProject\\src\\rover_client\\src",
+        "C:\\opt\\workspaces\\RoverProject\\src\\rover_main\\src"
+    ],
 }
