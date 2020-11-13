@@ -63,11 +63,11 @@ def get_controller_states():
     # Refernce the global CONTROLLER_DICT to be used locally
     global CONTROLLER_DICT
 
-    # Use the XBOX controller layout
-    if CONTROLLER_TYPE == "xbox":
-        
-        # Events are called when the button is pushed and when it is released
-        while not rospy.is_shutdown():
+    # Events are called when the button is pushed and when it is released
+    while not rospy.is_shutdown():
+
+        # Use the XBOX controller layout
+        if CONTROLLER_TYPE == "xbox":
 
             # X / A
             CONTROLLER_DICT["Key_X"] = bool(controller.get_button(0))
@@ -125,13 +125,78 @@ def get_controller_states():
             CONTROLLER_DICT["Joystick_RightY"] = controller.get_axis(4)
 
             # Right Trigger
-            CONTROLLER_DICT["Trigger_Right"] = convert_trigger(controller.get_axis(5))
+            CONTROLLER_DICT["Trigger_Right"] = convert_trigger_xbox(controller.get_axis(5))
 
             # Left Trigger
-            CONTROLLER_DICT["Trigger_Left"] = convert_trigger(controller.get_axis(2))
+            CONTROLLER_DICT["Trigger_Left"] = convert_trigger_xbox(controller.get_axis(2))
 
-            # Register new events
-            pygame.event.pump()
+        # Xboxdrv simulated controller
+        elif CONTROLLER_TYPE == "sim_xbox":
+            
+            # X / A
+            CONTROLLER_DICT["Key_X"] = bool(controller.get_button(0))
+
+            # Circle / B
+            CONTROLLER_DICT["Key_Circle"] = bool(controller.get_button(1))
+
+            # Triangle / X
+            CONTROLLER_DICT["Key_Triangle"] = bool(controller.get_button(3))
+
+            # Square / Y
+            CONTROLLER_DICT["Key_Square"] = bool(controller.get_button(2))
+            
+            # Left Bumper
+            CONTROLLER_DICT["Key_Bumper_Left"] = bool(controller.get_button(4))
+
+            # Right Bumper
+            CONTROLLER_DICT["Key_Bumper_Right"] = bool(controller.get_button(5))
+
+            # Dpad-Parser (Left / Right)
+            if controller.get_hat(0)[0] > 0.2:
+                CONTROLLER_DICT["Key_Dpad_Right"] = True
+                CONTROLLER_DICT["Key_Dpad_Left"] = False
+            elif controller.get_hat(0)[0] < -0.2:
+                CONTROLLER_DICT["Key_Dpad_Right"] = False
+                CONTROLLER_DICT["Key_Dpad_Left"] = True
+            else:
+                CONTROLLER_DICT["Key_Dpad_Right"] = False
+                CONTROLLER_DICT["Key_Dpad_Left"] = False
+
+            # Dpad-Parser (Up / Down)
+            if controller.get_hat(0)[1] > 0.2:
+                CONTROLLER_DICT["Key_Dpad_Up"] = True
+                CONTROLLER_DICT["Key_Dpad_Down"] = False
+            elif controller.get_hat(0)[1] < -0.2:
+                CONTROLLER_DICT["Key_Dpad_Up"] = False
+                CONTROLLER_DICT["Key_Dpad_Down"] = True
+            else:
+                CONTROLLER_DICT["Key_Dpad_Up"] = False
+                CONTROLLER_DICT["Key_Dpad_Down"] = False
+
+
+
+            # Left Joystick X
+            CONTROLLER_DICT["Joystick_LeftX"] = controller.get_axis(0)
+            
+
+            # Left Joystick Y
+            CONTROLLER_DICT["Joystick_LeftY"] = -controller.get_axis(1)
+
+            # Right Joystick X
+            CONTROLLER_DICT["Joystick_RightX"] = controller.get_axis(2)
+
+            # Right Joystick Y
+            CONTROLLER_DICT["Joystick_RightY"] = -controller.get_axis(3)
+
+            # Right Trigger
+            CONTROLLER_DICT["Trigger_Right"] = convert_trigger_xbox_sim(controller.get_axis(4))
+
+            # Left Trigger
+            CONTROLLER_DICT["Trigger_Left"] = convert_trigger_xbox_sim(controller.get_axis(5))
+
+
+        # Register new events
+        pygame.event.pump()
             
 
 def getCurrentControllerState():
@@ -167,8 +232,14 @@ def getCurrentControllerState():
 
     return controller_state
 
-def convert_trigger(value):
+def convert_trigger_xbox(value):
     """Convert the trigger to ranges from 0 to 1"""
     if value < 0:
         value = 0
+    return (value)
+
+def convert_trigger_xbox_sim(value):
+    """Convert the trigger to ranges from 0 to 1"""
+    value += 1
+    value /= 2
     return (value)

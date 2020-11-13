@@ -1,0 +1,6 @@
+<!--Simulated Xbox controller using xboxdrv-->
+<launch>
+    <param name="controller_type" value="sim_xbox"/>
+    <node name="ControllerService" pkg="rover_client" type="ControllerService" output="screen"/>
+    <node name="ControllerPublisher" pkg="rover_client" type="ControllerPublisher" output="screen"/>
+</launch>
