@@ -4,9 +4,7 @@ import rospy
 
 from rover_main.msg import controllerMap
 
-def control_commands_recievied():
-    """Called when new control information is recieived from the operator"""
-    pass
+CONTROLLER_STATE = None
 
 def create_node():
     """Starts the node and creates the required data topics"""
@@ -14,10 +12,23 @@ def create_node():
     # Create a new network communication node
     rospy.init_node("rover_network_comms", anonymous=True)
 
-    # Create the topic that control information will be sent over
-    rospy.Subscriber(name="rover_control_stream",
-                     data_class=controllerMap,
-                     callback=control_commands_recievied)
+    # Connect to the controller service directly to receive information about the controller state
+    rospy.wait_for_service("controller_service")
+    controller_service = rospy.ServiceProxy("controller_service", service_class=ControlService, persistent=True)
 
-   
+    # Communication Update Rate
+    update_rate = rospy.Rate(250)
+
+    while not rospy.is_shutdown():
+
+        # Update the controller state that the rover has
+        try:
+            CONTROLLER_STATE = controller_service().controllerState
+        except rospy.ServiceException as e:
+            print(f"An error ocurred when contacting the service: {e}")
+        
+        update_rate.sleep()
+
+if __name__ == "__main__":
+    create_node()
 
