@@ -1,0 +1,49 @@
+#!/usr/bin/python3
+"""Used to command the rover's motors and systems based on controller input"""
+
+import rospy
+
+from rover_main.msg import controllerMap
+
+from time import sleep
+import threading
+
+CONTROLLER_STATE = None
+
+def control_topic_update(callback_data):
+    global CONTROLLER_STATE
+    CONTROLLER_STATE = callback_data
+
+def create_node():
+    """Starts the node and subscribes the required data topics"""
+
+    # Create a new network communication node
+    rospy.init_node("rover_network_comms", anonymous=True)
+
+    # Subscribe to the controller topic to get information from
+    rospy.Subscriber(name="controller_state",
+                     data_class=controllerMap,
+                     callback=control_topic_update)
+    rospy.loginfo("Started Node...")
+
+    # Register subscriber events
+    rospy.spin()
+
+def control_thread():
+    global CONTROLLER_STATE
+    # Get the global version of controller state
+    while not rospy.is_shutdown():
+        print(CONTROLLER_STATE)
+
+        # Sleep to allow some pause
+        sleep(0.001)
+
+if __name__ == "__main__":
+    # Thread to handle actions taken based on controller input
+    controller_thread = threading.Thread(target=control_thread)
+    controller_thread.start()
+
+    create_node()
+
+    
+

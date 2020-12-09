@@ -1,20 +1,20 @@
 #!/usr/bin/python3
+"""Publishes the current controller state to a topic to be accessed from anywhere"""
 
 import rospy
 
 from rover_main.msg import controllerMap
-
-CONTROLLER_STATE = None
+from rover_client.srv import ControlService
 
 def create_node():
-    """Starts the node and creates the required data topics"""
+    # Start the new node to being receiving information
+    rospy.init_node("controller_node", anonymous=True)
 
-    # Create a new network communication node
-    rospy.init_node("rover_network_comms", anonymous=True)
-
-    # Connect to the controller service directly to receive information about the controller state
+    # Connect to the controller service to receive information about the controller state
     rospy.wait_for_service("controller_service")
     controller_service = rospy.ServiceProxy("controller_service", service_class=ControlService, persistent=True)
+
+    controller_topic = rospy.Publisher(name="controller_state", data_class=controllerMap, queue_size=1000)
 
     # Communication Update Rate
     update_rate = rospy.Rate(250)
@@ -23,7 +23,7 @@ def create_node():
 
         # Update the controller state that the rover has
         try:
-            CONTROLLER_STATE = controller_service().controllerState
+            controller_topic.publish(controller_service().controllerState)
         except rospy.ServiceException as e:
             print(f"An error ocurred when contacting the service: {e}")
         
@@ -31,4 +31,3 @@ def create_node():
 
 if __name__ == "__main__":
     create_node()
-

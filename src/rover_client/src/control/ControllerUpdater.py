@@ -2,11 +2,13 @@ import rospy
 
 import pygame
 
+from time import sleep
 import threading
 
 from rover_main.msg import controllerMap
 
 CONTROLLER_TYPE = ""
+CONTROLLER_CONNECTED = False
 
 # Local dictionary of the state of the controller
 CONTROLLER_DICT = {
@@ -53,12 +55,21 @@ def get_controller_states():
     pygame.display.init()
     pygame.joystick.init()
 
-    try:
-        # Get the first controller in the InputDevices
-        controller = pygame.joystick.Joystick(0)
-    except Exception as e:
-        rospy.loginfo("No Controller Detected: %s"%e)
-        return
+    global CONTROLLER_CONNECTED
+
+    # If no controller was found on start idle until a controller is connected
+    while not CONTROLLER_CONNECTED and not rospy.is_shutdown():
+        rospy.loginfo("Searching For Controller...")
+        try:
+            # Get the first controller in the InputDevices
+            controller = pygame.joystick.Joystick(0)
+            rospy.loginfo("Controller Found!")
+            CONTROLLER_CONNECTED = True
+        except Exception as e:
+            rospy.logerr("No Controller Detected: %s, Retrying in 2 seconds..."%e)
+            sleep(2)
+            # Update pygame
+            pygame.event.pump()
 
     # Refernce the global CONTROLLER_DICT to be used locally
     global CONTROLLER_DICT

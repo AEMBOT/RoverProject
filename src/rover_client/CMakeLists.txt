@@ -164,8 +164,8 @@ catkin_install_python(PROGRAMS
   # GUI Programs
   nodes/gui/RoverDriverStation
   # Rover Control
+  nodes/ControllerNode
   nodes/services/ControllerService
-  nodes/ControllerPublisher
   scripts/ControllerTopicTester
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
