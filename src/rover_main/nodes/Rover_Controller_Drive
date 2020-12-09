@@ -5,6 +5,8 @@ import rospy
 
 from rover_main.msg import controllerMap
 
+from motor_controllers.MCP import MCP
+
 from time import sleep
 import threading
 
@@ -23,7 +25,8 @@ def create_node():
     # Subscribe to the controller topic to get information from
     rospy.Subscriber(name="controller_state",
                      data_class=controllerMap,
-                     callback=control_topic_update)
+                     callback=control_topic_update,
+                     queue_size=1000)
     rospy.loginfo("Started Node...")
 
     # Register subscriber events
@@ -32,11 +35,47 @@ def create_node():
 def control_thread():
     global CONTROLLER_STATE
     # Get the global version of controller state
+
+    # Get the first controller address and set the serial port and baudrate
+    test_controller_address = get_controller_address(0)
+    test_controller = MCP("/dev/ttyS0", 38_400)
+
+    # Start communication with the specified controller
+    test_controller.Open()
+
+    # Wait for the controller values to populate
+    while CONTROLLER_STATE == None:
+        pass
+
+    # Simple test to run both motors 
     while not rospy.is_shutdown():
-        print(CONTROLLER_STATE)
+        left_y = float(CONTROLLER_STATE.Joystick_LeftY)
+        right_y = float(CONTROLLER_STATE.Joystick_RightY)
+
+        # Command Motor 1
+        if left_y > 0:
+           test_controller.ForwardM1(get_controller_address(0), unit_range_to_controller(left_y))
+        else:
+           test_controller.BackwardM1(get_controller_address(0), unit_range_to_controller(abs(left_y)))
+
+        # Command Motor 2
+        if right_y > 0:
+           test_controller.ForwardM2(get_controller_address(0), unit_range_to_controller(right_y))
+        else:
+           test_controller.BackwardM2(get_controller_address(0), unit_range_to_controller(abs(right_y)))
 
         # Sleep to allow some pause
         sleep(0.001)
+
+def get_controller_address(id):
+    """Returns the correct address for the controller id 0 - 7"""
+
+    addrs = [0x80, 0x81, 0x82, 0x83, 0x84, 0x85, 0x86, 0x87]
+    return addrs[id]
+
+def unit_range_to_controller(value):
+    """Convert from 0 - 1 to 0 - 127 to accomidate the motor controller values"""
+    return round(value * 127)
 
 if __name__ == "__main__":
     # Thread to handle actions taken based on controller input
