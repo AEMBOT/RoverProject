@@ -6,12 +6,13 @@ import time
 class MCP:
 	'MCP Interface Class'
 	
-	def __init__(self, comport, rate, timeout=0.01, retries=3):
+	def __init__(self, comport, rate, addr, timeout=0.01, retries=3):
 		self.comport = comport
 		self.rate = rate
 		self.timeout = timeout;
 		self._trystimeout = retries
 		self._crc = 0;
+		self.addr = addr
 
 	# Mappings for serial motor commands
 	class Cmd():
@@ -120,7 +121,7 @@ class MCP:
 				self._crc = self._crc << 1
 		return
 
-	def _sendcommand(self,address,command):
+	def _sendcommand(self,command):
 		self.crc_clear()
 		self.crc_update(address)
 		self._port.write(chr(address))
@@ -194,7 +195,7 @@ class MCP:
 	def _writeslong(self,val):
 		self._writelong(val)
 
-	def _read1(self,address,cmd):
+	def _read1(self,cmd):
 		trys = self._trystimeout
 		while 1:
 			self._port.flushInput()
@@ -211,7 +212,7 @@ class MCP:
 				break
 		return (0,0)
 
-	def _read2(self,address,cmd):
+	def _read2(self,cmd):
 		trys = self._trystimeout
 		while 1:
 			self._port.flushInput()
@@ -228,7 +229,7 @@ class MCP:
 				break
 		return (0,0)
 
-	def _read4(self,address,cmd):
+	def _read4(self,cmd):
 		trys = self._trystimeout
 		while 1:
 			self._port.flushInput()
@@ -245,7 +246,7 @@ class MCP:
 				break
 		return (0,0)
 
-	def _read4_1(self,address,cmd):
+	def _read4_1(self,cmd):
 		trys = self._trystimeout
 		while 1:
 			self._port.flushInput()
@@ -264,7 +265,7 @@ class MCP:
 				break
 		return (0,0)
 
-	def _read_n(self,address,cmd,args):
+	def _read_n(self,cmd,args):
 		trys = self._trystimeout
 		while 1:
 			self._port.flushInput()
@@ -296,7 +297,7 @@ class MCP:
 				return True
 		return False
 
-	def _write0(self,address,cmd):
+	def _write0(self,cmd):
 		trys=self._trystimeout
 		while trys:
 			self._sendcommand(address,cmd)
@@ -305,7 +306,7 @@ class MCP:
 			trys=trys-1
 		return False
 
-	def _write1(self,address,cmd,val):
+	def _write1(self,cmd,val):
 		trys=self._trystimeout
 		while trys:
 			self._sendcommand(address,cmd)
@@ -315,7 +316,7 @@ class MCP:
 			trys=trys-1
 		return False
 
-	def _write11(self,address,cmd,val1,val2):
+	def _write11(self,cmd,val1,val2):
 		trys=self._trystimeout
 		while trys:
 			self._sendcommand(address,cmd)
@@ -326,7 +327,7 @@ class MCP:
 			trys=trys-1
 		return False
 
-	def _write111(self,address,cmd,val1,val2,val3):
+	def _write111(self,cmd,val1,val2,val3):
 		trys=self._trystimeout
 		while trys:
 			self._sendcommand(address,cmd)
@@ -338,7 +339,7 @@ class MCP:
 			trys=trys-1
 		return False
 
-	def _write2(self,address,cmd,val):
+	def _write2(self,cmd,val):
 		trys=self._trystimeout
 		while trys:
 			self._sendcommand(address,cmd)
@@ -348,7 +349,7 @@ class MCP:
 			trys=trys-1
 		return False
 
-	def _writeS2(self,address,cmd,val):
+	def _writeS2(self,cmd,val):
 		trys=self._trystimeout
 		while trys:
 			self._sendcommand(address,cmd)
@@ -358,7 +359,7 @@ class MCP:
 			trys=trys-1
 		return False
 
-	def _write22(self,address,cmd,val1,val2):
+	def _write22(self,cmd,val1,val2):
 		trys=self._trystimeout
 		while trys:
 			self._sendcommand(address,cmd)
@@ -369,7 +370,7 @@ class MCP:
 			trys=trys-1
 		return False
 
-	def _writeS22(self,address,cmd,val1,val2):
+	def _writeS22(self,cmd,val1,val2):
 		trys=self._trystimeout
 		while trys:
 			self._sendcommand(address,cmd)
@@ -380,7 +381,7 @@ class MCP:
 			trys=trys-1
 		return False
 
-	def _writeS2S2(self,address,cmd,val1,val2):
+	def _writeS2S2(self,cmd,val1,val2):
 		trys=self._trystimeout
 		while trys:
 			self._sendcommand(address,cmd)
@@ -391,7 +392,7 @@ class MCP:
 			trys=trys-1
 		return False
 
-	def _writeS24(self,address,cmd,val1,val2):
+	def _writeS24(self,cmd,val1,val2):
 		trys=self._trystimeout
 		while trys:
 			self._sendcommand(address,cmd)
@@ -402,7 +403,7 @@ class MCP:
 			trys=trys-1
 		return False
 
-	def _writeS24S24(self,address,cmd,val1,val2,val3,val4):
+	def _writeS24S24(self,cmd,val1,val2,val3,val4):
 		trys=self._trystimeout
 		while trys:
 			self._sendcommand(address,cmd)
@@ -415,7 +416,7 @@ class MCP:
 			trys=trys-1
 		return False
 
-	def _write4(self,address,cmd,val):
+	def _write4(self,cmd,val):
 		trys=self._trystimeout
 		while trys:
 			self._sendcommand(address,cmd)
@@ -425,7 +426,7 @@ class MCP:
 			trys=trys-1
 		return False
 
-	def _writeS4(self,address,cmd,val):
+	def _writeS4(self,cmd,val):
 		trys=self._trystimeout
 		while trys:
 			self._sendcommand(address,cmd)
@@ -435,7 +436,7 @@ class MCP:
 			trys=trys-1
 		return False
 
-	def _write44(self,address,cmd,val1,val2):
+	def _write44(self,cmd,val1,val2):
 		trys=self._trystimeout
 		while trys:
 			self._sendcommand(address,cmd)
@@ -446,7 +447,7 @@ class MCP:
 			trys=trys-1
 		return False
 
-	def _write4S4(self,address,cmd,val1,val2):
+	def _write4S4(self,cmd,val1,val2):
 		trys=self._trystimeout
 		while trys:
 			self._sendcommand(address,cmd)
@@ -457,7 +458,7 @@ class MCP:
 			trys=trys-1
 		return False
 
-	def _writeS4S4(self,address,cmd,val1,val2):
+	def _writeS4S4(self,cmd,val1,val2):
 		trys=self._trystimeout
 		while trys:
 			self._sendcommand(address,cmd)
@@ -468,7 +469,7 @@ class MCP:
 			trys=trys-1
 		return False
 
-	def _write441(self,address,cmd,val1,val2,val3):
+	def _write441(self,cmd,val1,val2,val3):
 		trys=self._trystimeout
 		while trys:
 			self._sendcommand(address,cmd)
@@ -480,7 +481,7 @@ class MCP:
 			trys=trys-1
 		return False
 
-	def _writeS441(self,address,cmd,val1,val2,val3):
+	def _writeS441(self,cmd,val1,val2,val3):
 		trys=self._trystimeout
 		while trys:
 			self._sendcommand(address,cmd)
@@ -492,7 +493,7 @@ class MCP:
 			trys=trys-1
 		return False
 
-	def _write4S4S4(self,address,cmd,val1,val2,val3):
+	def _write4S4S4(self,cmd,val1,val2,val3):
 		trys=self._trystimeout
 		while trys:
 			self._sendcommand(address,cmd)
@@ -504,7 +505,7 @@ class MCP:
 			trys=trys-1
 		return False
 
-	def _write4S441(self,address,cmd,val1,val2,val3,val4):
+	def _write4S441(self,cmd,val1,val2,val3,val4):
 		trys=self._trystimeout
 		while trys:
 			self._sendcommand(address,cmd)
@@ -517,7 +518,7 @@ class MCP:
 			trys=trys-1
 		return False
 
-	def _write4444(self,address,cmd,val1,val2,val3,val4):
+	def _write4444(self,cmd,val1,val2,val3,val4):
 		trys=self._trystimeout
 		while trys:
 			self._sendcommand(address,cmd)
@@ -530,7 +531,7 @@ class MCP:
 			trys=trys-1
 		return False
 
-	def _write4S44S4(self,address,cmd,val1,val2,val3,val4):
+	def _write4S44S4(self,cmd,val1,val2,val3,val4):
 		trys=self._trystimeout
 		while trys:
 			self._sendcommand(address,cmd)
@@ -543,7 +544,7 @@ class MCP:
 			trys=trys-1
 		return False
 
-	def _write44441(self,address,cmd,val1,val2,val3,val4,val5):
+	def _write44441(self,cmd,val1,val2,val3,val4,val5):
 		trys=self._trystimeout
 		while trys:
 			self._sendcommand(address,cmd)
@@ -557,7 +558,7 @@ class MCP:
 			trys=trys-1
 		return False
 
-	def _writeS44S441(self,address,cmd,val1,val2,val3,val4,val5):
+	def _writeS44S441(self,cmd,val1,val2,val3,val4,val5):
 		trys=self._trystimeout
 		while trys:
 			self._sendcommand(address,cmd)
@@ -571,7 +572,7 @@ class MCP:
 			trys=trys-1
 		return False
 
-	def _write4S44S441(self,address,cmd,val1,val2,val3,val4,val5,val6):
+	def _write4S44S441(self,cmd,val1,val2,val3,val4,val5,val6):
 		trys=self._trystimeout
 		while trys:
 			self._sendcommand(address,cmd)
@@ -586,10 +587,10 @@ class MCP:
 			trys=trys-1
 		return False
 
-	def _write4S444S441(self,address,cmd,val1,val2,val3,val4,val5,val6,val7):
+	def _write4S444S441(self,cmd,val1,val2,val3,val4,val5,val6,val7):
 		trys=self._trystimeout
 		while trys:
-			self._sendcommand(self,address,cmd)
+			self._sendcommand(self,cmd)
 			self._writelong(val1)
 			self._writeslong(val2)
 			self._writelong(val3)
@@ -602,7 +603,7 @@ class MCP:
 			trys=trys-1
 		return False
 
-	def _write4444444(self,address,cmd,val1,val2,val3,val4,val5,val6,val7):
+	def _write4444444(self,cmd,val1,val2,val3,val4,val5,val6,val7):
 		trys=self._trystimeout
 		while trys:
 			self._sendcommand(address,cmd)
@@ -618,7 +619,7 @@ class MCP:
 			trys=trys-1
 		return False
 
-	def _write444444441(self,address,cmd,val1,val2,val3,val4,val5,val6,val7,val8,val9):
+	def _write444444441(self,cmd,val1,val2,val3,val4,val5,val6,val7,val8,val9):
 		trys=self._trystimeout
 		while trys:
 			self._sendcommand(address,cmd)
@@ -643,68 +644,68 @@ class MCP:
 			self._port.write(chr(byte))
 		return
 
-	def ForwardM1(self,address,val):
-		return self._write1(address,self.Cmd.M1FORWARD,val)
+	def ForwardM1(self,val):
+		return self._write1(self.addr,self.Cmd.M1FORWARD,val)
 
-	def BackwardM1(self,address,val):
-		return self._write1(address,self.Cmd.M1BACKWARD,val)
+	def BackwardM1(self,val):
+		return self._write1(self.addr,self.Cmd.M1BACKWARD,val)
 
-	def SetMinVoltageMainBattery(self,address,val):
-		return self._write1(address,self.Cmd.SETMINMB,val)
+	def SetMinVoltageMainBattery(self,val):
+		return self._write1(self.addr,self.Cmd.SETMINMB,val)
 
-	def SetMaxVoltageMainBattery(self,address,val):
-		return self._write1(address,self.Cmd.SETMAXMB,val)
+	def SetMaxVoltageMainBattery(self,val):
+		return self._write1(self.addr,self.Cmd.SETMAXMB,val)
 
-	def ForwardM2(self,address,val):
-		return self._write1(address,self.Cmd.M2FORWARD,val)
+	def ForwardM2(self,val):
+		return self._write1(self.addr,self.Cmd.M2FORWARD,val)
 
-	def BackwardM2(self,address,val):
-		return self._write1(address,self.Cmd.M2BACKWARD,val)
+	def BackwardM2(self,val):
+		return self._write1(self.addr,self.Cmd.M2BACKWARD,val)
 
-	def ForwardBackwardM1(self,address,val):
-		return self._write1(address,self.Cmd.M17BIT,val)
+	def ForwardBackwardM1(self,val):
+		return self._write1(self.addr,self.Cmd.M17BIT,val)
 
-	def ForwardBackwardM2(self,address,val):
-		return self._write1(address,self.Cmd.M27BIT,val)
+	def ForwardBackwardM2(self,val):
+		return self._write1(self.addr,self.Cmd.M27BIT,val)
 
-	def ForwardMixed(self,address,val):
-		return self._write1(address,self.Cmd.MIXEDFORWARD,val)
+	def ForwardMixed(self,val):
+		return self._write1(self.addr,self.Cmd.MIXEDFORWARD,val)
 
-	def BackwardMixed(self,address,val):
-		return self._write1(address,self.Cmd.MIXEDBACKWARD,val)
+	def BackwardMixed(self,val):
+		return self._write1(self.addr,self.Cmd.MIXEDBACKWARD,val)
 
-	def TurnRightMixed(self,address,val):
-		return self._write1(address,self.Cmd.MIXEDRIGHT,val)
+	def TurnRightMixed(self,val):
+		return self._write1(self.addr,self.Cmd.MIXEDRIGHT,val)
 
-	def TurnLeftMixed(self,address,val):
-		return self._write1(address,self.Cmd.MIXEDLEFT,val)
+	def TurnLeftMixed(self,val):
+		return self._write1(self.addr,self.Cmd.MIXEDLEFT,val)
 
-	def ForwardBackwardMixed(self,address,val):
-		return self._write1(address,self.Cmd.MIXEDFB,val)
+	def ForwardBackwardMixed(self,val):
+		return self._write1(self.addr,self.Cmd.MIXEDFB,val)
 
-	def LeftRightMixed(self,address,val):
-		return self._write1(address,self.Cmd.MIXEDLR,val)
+	def LeftRightMixed(self,val):
+		return self._write1(self.addr,self.Cmd.MIXEDLR,val)
 
-	def ReadEncM1(self,address):
-		return self._read4_1(address,self.Cmd.GETM1ENC)
+	def ReadEncM1(self):
+		return self._read4_1(self.addr,self.Cmd.GETM1ENC)
 
-	def ReadEncM2(self,address):
-		return self._read4_1(address,self.Cmd.GETM2ENC)
+	def ReadEncM2(self):
+		return self._read4_1(self.addr,self.Cmd.GETM2ENC)
 
-	def ReadSpeedM1(self,address):
-		return self._read4_1(address,self.Cmd.GETM1SPEED)
+	def ReadSpeedM1(self):
+		return self._read4_1(self.addr,self.Cmd.GETM1SPEED)
 
-	def ReadSpeedM2(self,address):
-		return self._read4_1(address,self.Cmd.GETM2SPEED)
+	def ReadSpeedM2(self):
+		return self._read4_1(self.addr,self.Cmd.GETM2SPEED)
 
-	def ResetEncoders(self,address):
-		return self._write0(address,self.Cmd.RESETENC)
+	def ResetEncoders(self):
+		return self._write0(self.addr,self.Cmd.RESETENC)
 
-	def ReadVersion(self,address):
+	def ReadVersion(self):
 		trys=self._trystimeout
 		while 1:
 			self._port.flushInput()
-			self._sendcommand(address,self.Cmd.GETVERSION)
+			self._sendcommand(self.addr,self.Cmd.GETVERSION)
 			str = ""
 			passed = True
 			for i in range(0,48):
@@ -730,89 +731,89 @@ class MCP:
 				break
 		return (0,0)
 
-	def SetEncM1(self,address,cnt):
-		return self._write4(address,self.Cmd.SETM1ENCCOUNT,cnt)
+	def SetEncM1(self,cnt):
+		return self._write4(self.addr,self.Cmd.SETM1ENCCOUNT,cnt)
 
-	def SetEncM2(self,address,cnt):
-		return self._write4(address,self.Cmd.SETM2ENCCOUNT,cnt)
+	def SetEncM2(self,cnt):
+		return self._write4(self.addr,self.Cmd.SETM2ENCCOUNT,cnt)
 
-	def ReadMainBatteryVoltage(self,address):
-		return self._read2(address,self.Cmd.GETMBATT)
+	def ReadMainBatteryVoltage(self):
+		return self._read2(self.addr,self.Cmd.GETMBATT)
 
-	def ReadLogicBatteryVoltage(self,address,):
-		return self._read2(address,self.Cmd.GETLBATT)
+	def ReadLogicBatteryVoltage(self,):
+		return self._read2(self.addr,self.Cmd.GETLBATT)
 
-	def SetMinVoltageLogicBattery(self,address,val):
-		return self._write1(address,self.Cmd.SETMINLB,val)
+	def SetMinVoltageLogicBattery(self,val):
+		return self._write1(self.addr,self.Cmd.SETMINLB,val)
 
-	def SetMaxVoltageLogicBattery(self,address,val):
-		return self._write1(address,self.Cmd.SETMAXLB,val)
+	def SetMaxVoltageLogicBattery(self,val):
+		return self._write1(self.addr,self.Cmd.SETMAXLB,val)
 
-	def SetM1VelocityPID(self,address,p,i,d,qpps):
-		return self._write4444(address,self.Cmd.SETM1PID,long(d*65536),long(p*65536),long(i*65536),qpps)
+	def SetM1VelocityPID(self,p,i,d,qpps):
+		return self._write4444(self.addr,self.Cmd.SETM1PID,long(d*65536),long(p*65536),long(i*65536),qpps)
 
-	def SetM2VelocityPID(self,address,p,i,d,qpps):
-		return self._write4444(address,self.Cmd.SETM2PID,long(d*65536),long(p*65536),long(i*65536),qpps)
+	def SetM2VelocityPID(self,p,i,d,qpps):
+		return self._write4444(self.addr,self.Cmd.SETM2PID,long(d*65536),long(p*65536),long(i*65536),qpps)
 
-	def ReadISpeedM1(self,address):
-		return self._read4_1(address,self.Cmd.GETM1ISPEED)
+	def ReadISpeedM1(self):
+		return self._read4_1(self.addr,self.Cmd.GETM1ISPEED)
 
-	def ReadISpeedM2(self,address):
-		return self._read4_1(address,self.Cmd.GETM2ISPEED)
+	def ReadISpeedM2(self):
+		return self._read4_1(self.addr,self.Cmd.GETM2ISPEED)
 
-	def DutyM1(self,address,val):
-		return self._simplFunctionS2(address,self.Cmd.M1DUTY,val)
+	def DutyM1(self,val):
+		return self._simplFunctionS2(self.addr,self.Cmd.M1DUTY,val)
 
-	def DutyM2(self,address,val):
-		return self._simplFunctionS2(address,self.Cmd.M2DUTY,val)
+	def DutyM2(self,val):
+		return self._simplFunctionS2(self.addr,self.Cmd.M2DUTY,val)
 
-	def DutyM1M2(self,address,m1,m2):
-		return self._writeS2S2(address,self.Cmd.MIXEDDUTY,m1,m2)
+	def DutyM1M2(self,m1,m2):
+		return self._writeS2S2(self.addr,self.Cmd.MIXEDDUTY,m1,m2)
 
-	def SpeedM1(self,address,val):
-		return self._writeS4(address,self.Cmd.M1SPEED,val)
+	def SpeedM1(self,val):
+		return self._writeS4(self.addr,self.Cmd.M1SPEED,val)
 
-	def SpeedM2(self,address,val):
-		return self._writeS4(address,self.Cmd.M2SPEED,val)
+	def SpeedM2(self,val):
+		return self._writeS4(self.addr,self.Cmd.M2SPEED,val)
 
-	def SpeedM1M2(self,address,m1,m2):
-		return self._writeS4S4(address,self.Cmd.MIXEDSPEED,m1,m2)
+	def SpeedM1M2(self,m1,m2):
+		return self._writeS4S4(self.addr,self.Cmd.MIXEDSPEED,m1,m2)
 
-	def SpeedAccelM1(self,address,accel,speed):
-		return self._write4S4(address,self.Cmd.M1SPEEDACCEL,accel,speed)
+	def SpeedAccelM1(self,accel,speed):
+		return self._write4S4(self.addr,self.Cmd.M1SPEEDACCEL,accel,speed)
 
-	def SpeedAccelM2(self,address,accel,speed):
-		return self._write4S4(address,self.Cmd.M2SPEEDACCEL,accel,speed)
+	def SpeedAccelM2(self,accel,speed):
+		return self._write4S4(self.addr,self.Cmd.M2SPEEDACCEL,accel,speed)
 
-	def SpeedAccelM1M2(self,address,accel,speed1,speed2):
-		return self._write4S4S4(address,self.Cmd.MIXEDSPEEDACCEL,accel,speed1,speed2)
+	def SpeedAccelM1M2(self,accel,speed1,speed2):
+		return self._write4S4S4(self.addr,self.Cmd.MIXEDSPEEDACCEL,accel,speed1,speed2)
 
-	def SpeedDistanceM1(self,address,speed,distance,buffer):
-		return self._writeS441(address,self.Cmd.M1SPEEDDIST,speed,distance,buffer)
+	def SpeedDistanceM1(self,speed,distance,buffer):
+		return self._writeS441(self.addr,self.Cmd.M1SPEEDDIST,speed,distance,buffer)
 
-	def SpeedDistanceM2(self,address,speed,distance,buffer):
-		return self._writeS441(address,self.Cmd.M2SPEEDDIST,speed,distance,buffer)
+	def SpeedDistanceM2(self,speed,distance,buffer):
+		return self._writeS441(self.addr,self.Cmd.M2SPEEDDIST,speed,distance,buffer)
 
-	def SpeedDistanceM1M2(self,address,speed1,distance1,speed2,distance2,buffer):
-		return self._writeS44S441(address,self.Cmd.MIXEDSPEEDDIST,speed1,distance1,speed2,distance2,buffer)
+	def SpeedDistanceM1M2(self,speed1,distance1,speed2,distance2,buffer):
+		return self._writeS44S441(self.addr,self.Cmd.MIXEDSPEEDDIST,speed1,distance1,speed2,distance2,buffer)
 
-	def SpeedAccelDistanceM1(self,address,accel,speed,distance,buffer):
-		return self._write4S441(address,self.Cmd.M1SPEEDACCELDIST,accel,speed,distance,buffer)
+	def SpeedAccelDistanceM1(self,accel,speed,distance,buffer):
+		return self._write4S441(self.addr,self.Cmd.M1SPEEDACCELDIST,accel,speed,distance,buffer)
 
-	def SpeedAccelDistanceM2(self,address,accel,speed,distance,buffer):
-		return self._write4S441(address,self.Cmd.M2SPEEDACCELDIST,accel,speed,distance,buffer)
+	def SpeedAccelDistanceM2(self,accel,speed,distance,buffer):
+		return self._write4S441(self.addr,self.Cmd.M2SPEEDACCELDIST,accel,speed,distance,buffer)
 
-	def SpeedAccelDistanceM1M2(self,address,accel,speed1,distance1,speed2,distance2,buffer):
-		return self._write4S44S441(address,self.Cmd.MIXEDSPEEDACCELDIST,accel,speed1,distance1,speed2,distance2,buffer)
+	def SpeedAccelDistanceM1M2(self,accel,speed1,distance1,speed2,distance2,buffer):
+		return self._write4S44S441(self.addr,self.Cmd.MIXEDSPEEDACCELDIST,accel,speed1,distance1,speed2,distance2,buffer)
 
-	def ReadBuffers(self,address):
-		val = self._read2(address,self.Cmd.GETBUFFERS)
+	def ReadBuffers(self):
+		val = self._read2(self.addr,self.Cmd.GETBUFFERS)
 		if val[0]:
 			return (1,val[1]>>8,val[1]&0xFF)
 		return (0,0,0)
 
-	def ReadPWMs(self,address):
-		val = self._read4(address,self.Cmd.GETPWMS)
+	def ReadPWMs(self):
+		val = self._read4(self.addr,self.Cmd.GETPWMS)
 		if val[0]:
 			pwm1 = val[1]>>16
 			pwm2 = val[1]&0xFFFF
@@ -823,8 +824,8 @@ class MCP:
 			return (1,pwm1,pwm2)
 		return (0,0,0)
 
-	def ReadCurrents(self,address):
-		val = self._read4(address,self.Cmd.GETCURRENTS)
+	def ReadCurrents(self):
+		val = self._read4(self.addr,self.Cmd.GETCURRENTS)
 		if val[0]:
 			cur1 = val[1]>>16
 			cur2 = val[1]&0xFFFF
@@ -835,23 +836,23 @@ class MCP:
 			return (1,cur1,cur2)
 		return (0,0,0)
 
-	def SpeedAccelM1M2_2(self,address,accel1,speed1,accel2,speed2):
-		return self._write4S44S4(address,self.Cmd.MIXEDSPEED2ACCEL,accel,speed1,accel2,speed2)
+	def SpeedAccelM1M2_2(self,accel1,speed1,accel2,speed2):
+		return self._write4S44S4(self.addr,self.Cmd.MIXEDSPEED2ACCEL,accel,speed1,accel2,speed2)
 
-	def SpeedAccelDistanceM1M2_2(self,address,accel1,speed1,distance1,accel2,speed2,distance2,buffer):
-		return self._write4S444S441(address,self.Cmd.MIXEDSPEED2ACCELDIST,accel1,speed1,distance1,accel2,speed2,distance2,buffer)
+	def SpeedAccelDistanceM1M2_2(self,accel1,speed1,distance1,accel2,speed2,distance2,buffer):
+		return self._write4S444S441(self.addr,self.Cmd.MIXEDSPEED2ACCELDIST,accel1,speed1,distance1,accel2,speed2,distance2,buffer)
 
-	def DutyAccelM1(self,address,accel,duty):
-		return self._writeS24(address,self.Cmd.M1DUTYACCEL,duty,accel)
+	def DutyAccelM1(self,accel,duty):
+		return self._writeS24(self.addr,self.Cmd.M1DUTYACCEL,duty,accel)
 
-	def DutyAccelM2(self,address,accel,duty):
-		return self._writeS24(address,self.Cmd.M2DUTYACCEL,duty,accel)
+	def DutyAccelM2(self,accel,duty):
+		return self._writeS24(self.addr,self.Cmd.M2DUTYACCEL,duty,accel)
 
-	def DutyAccelM1M2(self,address,accel1,duty1,accel2,duty2):
+	def DutyAccelM1M2(self,self.addr,accel1,duty1,accel2,duty2):
 		return self._writeS24S24(self.Cmd.MIXEDDUTYACCEL,duty1,accel1,duty2,accel2)
 		
-	def ReadM1VelocityPID(self,address):
-		data = self._read_n(address,self.Cmd.READM1PID,4)
+	def ReadM1VelocityPID(self):
+		data = self._read_n(self.addr,self.Cmd.READM1PID,4)
 		if data[0]:
 			data[1]/=65536.0
 			data[2]/=65536.0
@@ -859,8 +860,8 @@ class MCP:
 			return data
 		return (0,0,0,0,0)
 
-	def ReadM2VelocityPID(self,address):
-		data = self._read_n(address,self.Cmd.READM2PID,4)
+	def ReadM2VelocityPID(self):
+		data = self._read_n(self.addr,self.Cmd.READM2PID,4)
 		if data[0]:
 			data[1]/=65536.0
 			data[2]/=65536.0
@@ -868,36 +869,36 @@ class MCP:
 			return data
 		return (0,0,0,0,0)
 
-	def SetMainVoltages(self,address,min, max):
-		return self._write22(address,self.Cmd.SETMAINVOLTAGES,min,max)
+	def SetMainVoltages(self,min, max):
+		return self._write22(self.addr,self.Cmd.SETMAINVOLTAGES,min,max)
 		
-	def SetLogicVoltages(self,address,min, max):
-		return self._write22(address,self.Cmd.SETLOGICVOLTAGES,min,max)
+	def SetLogicVoltages(self,min, max):
+		return self._write22(self.addr,self.Cmd.SETLOGICVOLTAGES,min,max)
 		
-	def ReadMinMaxMainVoltages(self,address):
-		val = self._read4(address,self.Cmd.GETMINMAXMAINVOLTAGES)
+	def ReadMinMaxMainVoltages(self):
+		val = self._read4(self.addr,self.Cmd.GETMINMAXMAINVOLTAGES)
 		if val[0]:
 			min = val[1]>>16
 			max = val[1]&0xFFFF
 			return (1,min,max)
 		return (0,0,0)
 
-	def ReadMinMaxLogicVoltages(self,address):
-		val = self._read4(address,self.Cmd.GETMINMAXLOGICVOLTAGES)
+	def ReadMinMaxLogicVoltages(self):
+		val = self._read4(self.addr,self.Cmd.GETMINMAXLOGICVOLTAGES)
 		if val[0]:
 			min = val[1]>>16
 			max = val[1]&0xFFFF
 			return (1,min,max)
 		return (0,0,0)
 
-	def SetM1PositionPID(self,address,kp,ki,kd,kimax,deadzone,min,max):
-		return self._write4444444(address,self.Cmd.SETM1POSPID,long(kd*1024),long(kp*1024),long(ki*1024),kimax,deadzone,min,max)
+	def SetM1PositionPID(self,kp,ki,kd,kimax,deadzone,min,max):
+		return self._write4444444(self.addr,self.Cmd.SETM1POSPID,long(kd*1024),long(kp*1024),long(ki*1024),kimax,deadzone,min,max)
 
-	def SetM2PositionPID(self,address,kp,ki,kd,kimax,deadzone,min,max):
-		return self._write4444444(address,self.Cmd.SETM2POSPID,long(kd*1024),long(kp*1024),long(ki*1024),kimax,deadzone,min,max)
+	def SetM2PositionPID(self,kp,ki,kd,kimax,deadzone,min,max):
+		return self._write4444444(self.addr,self.Cmd.SETM2POSPID,long(kd*1024),long(kp*1024),long(ki*1024),kimax,deadzone,min,max)
 
-	def ReadM1PositionPID(self,address):
-		data = self._read_n(address,self.Cmd.READM1POSPID,7)
+	def ReadM1PositionPID(self):
+		data = self._read_n(self.addr,self.Cmd.READM1POSPID,7)
 		if data[0]:
 			data[1]/=1024.0
 			data[2]/=1024.0
@@ -905,8 +906,8 @@ class MCP:
 			return data
 		return (0,0,0,0,0,0,0,0)
 		
-	def ReadM2PositionPID(self,address):
-		data = self._read_n(address,self.Cmd.READM2POSPID,7)
+	def ReadM2PositionPID(self):
+		data = self._read_n(self.addr,self.Cmd.READM2POSPID,7)
 		if data[0]:
 			data[1]/=1024.0
 			data[2]/=1024.0
@@ -914,28 +915,28 @@ class MCP:
 			return data
 		return (0,0,0,0,0,0,0,0)
 
-	def SpeedAccelDeccelPositionM1(self,address,accel,speed,deccel,position,buffer):
-		return self._write44441(address,self.Cmd.M1SPEEDACCELDECCELPOS,accel,speed,deccel,position,buffer)
+	def SpeedAccelDeccelPositionM1(self,accel,speed,deccel,position,buffer):
+		return self._write44441(self.addr,self.Cmd.M1SPEEDACCELDECCELPOS,accel,speed,deccel,position,buffer)
 
-	def SpeedAccelDeccelPositionM2(self,address,accel,speed,deccel,position,buffer):
-		return self._write44441(address,self.Cmd.M2SPEEDACCELDECCELPOS,accel,speed,deccel,position,buffer)
+	def SpeedAccelDeccelPositionM2(self,accel,speed,deccel,position,buffer):
+		return self._write44441(self.addr,self.Cmd.M2SPEEDACCELDECCELPOS,accel,speed,deccel,position,buffer)
 
-	def SpeedAccelDeccelPositionM1M2(self,address,accel1,speed1,deccel1,position1,accel2,speed2,deccel2,position2,buffer):
-		return self._write444444441(address,self.Cmd.MIXEDSPEEDACCELDECCELPOS,accel1,speed1,deccel1,position1,accel2,speed2,deccel2,position2,buffer)
+	def SpeedAccelDeccelPositionM1M2(self,accel1,speed1,deccel1,position1,accel2,speed2,deccel2,position2,buffer):
+		return self._write444444441(self.addr,self.Cmd.MIXEDSPEEDACCELDECCELPOS,accel1,speed1,deccel1,position1,accel2,speed2,deccel2,position2,buffer)
 
-	def SetM1DefaultAccel(self,address,accel):
-		return self._write4(address,self.Cmd.SETM1DEFAULTACCEL,accel)
+	def SetM1DefaultAccel(self,accel):
+		return self._write4(self.addr,self.Cmd.SETM1DEFAULTACCEL,accel)
 
-	def SetM2DefaultAccel(self,address,accel):
-		return self._write4(address,self.Cmd.SETM2DEFAULTACCEL,accel)
+	def SetM2DefaultAccel(self,accel):
+		return self._write4(self.addr,self.Cmd.SETM2DEFAULTACCEL,accel)
 
-	def SetPinFunctions(self,address,S3mode,S4mode,S5mode):
-		return self._write111(address,self.Cmd.SETPINFUNCTIONS,S3mode,S4mode,S5mode)
+	def SetPinFunctions(self,S3mode,S4mode,S5mode):
+		return self._write111(self.addr,self.Cmd.SETPINFUNCTIONS,S3mode,S4mode,S5mode)
 
-	def ReadPinFunctions(self,address):
+	def ReadPinFunctions(self):
 		trys = self._trystimeout
 		while 1:
-			self._sendcommand(address,self.Cmd.GETPINFUNCTIONS)
+			self._sendcommand(self.addr,self.Cmd.GETPINFUNCTIONS)
 			val1 = self._readbyte()
 			if val1[0]:
 				val2 = self._readbyte()
@@ -952,80 +953,80 @@ class MCP:
 				break
 		return (0,0)
 
-	def SetDeadBand(self,address,min,max):
-		return self._write11(address,self.Cmd.SETDEADBAND,min,max)
+	def SetDeadBand(self,min,max):
+		return self._write11(self.addr,self.Cmd.SETDEADBAND,min,max)
 
-	def GetDeadBand(self,address):
-		val = self._read2(address,self.Cmd.GETDEADBAND)
+	def GetDeadBand(self):
+		val = self._read2(self.addr,self.Cmd.GETDEADBAND)
 		if val[0]:
 			return (1,val[1]>>8,val[1]&0xFF)
 		return (0,0,0)
 		
 	#Warning(TTL Serial): Baudrate will change if not already set to 38400.  Communications will be lost
-	def RestoreDefaults(self,address):
-		return self._write0(address,self.Cmd.RESTOREDEFAULTS)
+	def RestoreDefaults(self):
+		return self._write0(self.addr,self.Cmd.RESTOREDEFAULTS)
 
-	def ReadTemp(self,address):
-		return self._read2(address,self.Cmd.GETTEMP)
+	def ReadTemp(self):
+		return self._read2(self.addr,self.Cmd.GETTEMP)
 
-	def ReadTemp2(self,address):
-		return self._read2(address,self.Cmd.GETTEMP2)
+	def ReadTemp2(self):
+		return self._read2(self.addr,self.Cmd.GETTEMP2)
 
-	def ReadError(self,address):
-		return self._read2(address,self.Cmd.GETERROR)
+	def ReadError(self):
+		return self._read2(self.addr,self.Cmd.GETERROR)
 
-	def ReadEncoderModes(self,address):
-		val = self._read2(address,self.Cmd.GETENCODERMODE)
+	def ReadEncoderModes(self):
+		val = self._read2(self.addr,self.Cmd.GETENCODERMODE)
 		if val[0]:
 			return (1,val[1]>>8,val[1]&0xFF)
 		return (0,0,0)
 		
-	def SetM1EncoderMode(self,address,mode):
-		return self._write1(address,self.Cmd.SETM1ENCODERMODE,mode)
+	def SetM1EncoderMode(self,mode):
+		return self._write1(self.addr,self.Cmd.SETM1ENCODERMODE,mode)
 
-	def SetM2EncoderMode(self,address,mode):
-		return self._write1(address,self.Cmd.SETM2ENCODERMODE,mode)
+	def SetM2EncoderMode(self,mode):
+		return self._write1(self.addr,self.Cmd.SETM2ENCODERMODE,mode)
 
 	#saves active settings to NVM
-	def WriteNVM(self,address):
-		return self._write4(address,self.Cmd.WRITENVM,0xE22EAB7A)
+	def WriteNVM(self):
+		return self._write4(self.addr,self.Cmd.WRITENVM,0xE22EAB7A)
 
 	#restores settings from NVM
 	#Warning(TTL Serial): If baudrate changes or the control mode changes communications will be lost
-	def ReadNVM(self,address):
-		return self._write0(address,self.Cmd.READNVM)
+	def ReadNVM(self):
+		return self._write0(self.addr,self.Cmd.READNVM)
 
 	#Warning(TTL Serial): If control mode is changed from packet serial mode when setting config communications will be lost!
 	#Warning(TTL Serial): If baudrate of packet serial mode is changed communications will be lost!
-	def SetConfig(self,address,config):
-		return self._write2(address,self.Cmd.SETCONFIG,config)
+	def SetConfig(self,config):
+		return self._write2(self.addr,self.Cmd.SETCONFIG,config)
 
-	def GetConfig(self,address):
-		return self._read2(address,self.Cmd.GETCONFIG)
+	def GetConfig(self):
+		return self._read2(self.addr,self.Cmd.GETCONFIG)
 
-	def SetM1MaxCurrent(self,address,max):
-		return self._write44(address,self.Cmd.SETM1MAXCURRENT,max,0)
+	def SetM1MaxCurrent(self,max):
+		return self._write44(self.addr,self.Cmd.SETM1MAXCURRENT,max,0)
 
-	def SetM2MaxCurrent(self,address,max):
-		return self._write44(address,self.Cmd.SETM2MAXCURRENT,max,0)
+	def SetM2MaxCurrent(self,max):
+		return self._write44(self.addr,self.Cmd.SETM2MAXCURRENT,max,0)
 
-	def ReadM1MaxCurrent(self,address):
-		data = self._read_n(address,self.Cmd.GETM1MAXCURRENT,2)
+	def ReadM1MaxCurrent(self):
+		data = self._read_n(self.addr,self.Cmd.GETM1MAXCURRENT,2)
 		if data[0]:
 			return (1,data[1])
 		return (0,0)
 
-	def ReadM2MaxCurrent(self,address):
-		data = self._read_n(address,self.Cmd.GETM2MAXCURRENT,2)
+	def ReadM2MaxCurrent(self):
+		data = self._read_n(self.addr,self.Cmd.GETM2MAXCURRENT,2)
 		if data[0]:
 			return (1,data[1])
 		return (0,0)
 
-	def SetPWMMode(self,address,mode):
-		return self._write1(address,self.Cmd.SETPWMMODE,mode)
+	def SetPWMMode(self,mode):
+		return self._write1(self.addr,self.Cmd.SETPWMMODE,mode)
 
-	def ReadPWMMode(self,address):
-		return self._read1(address,self.Cmd.GETPWMMODE)
+	def ReadPWMMode(self):
+		return self._read1(self.addr,self.Cmd.GETPWMMODE)
 
 	def Open(self):
 		try:

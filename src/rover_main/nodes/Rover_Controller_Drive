@@ -36,9 +36,8 @@ def control_thread():
     global CONTROLLER_STATE
     # Get the global version of controller state
 
-    # Get the first controller address and set the serial port and baudrate
-    test_controller_address = get_controller_address(0)
-    test_controller = MCP("/dev/ttyS0", 38_400)
+    # Get the first controller address and set the serial port and baudrate and address
+    test_controller: MCP = MCP(comport="/dev/ttyS0", rate=38_400, addr=get_controller_address(0))
 
     # Start communication with the specified controller
     test_controller.Open()
@@ -54,15 +53,15 @@ def control_thread():
 
         # Command Motor 1
         if left_y > 0:
-           test_controller.ForwardM1(get_controller_address(0), unit_range_to_controller(left_y))
+           test_controller.ForwardM1(unit_range_to_controller(left_y))
         else:
-           test_controller.BackwardM1(get_controller_address(0), unit_range_to_controller(abs(left_y)))
+           test_controller.BackwardM1(unit_range_to_controller(abs(left_y)))
 
         # Command Motor 2
         if right_y > 0:
-           test_controller.ForwardM2(get_controller_address(0), unit_range_to_controller(right_y))
+           test_controller.ForwardM2(unit_range_to_controller(right_y))
         else:
-           test_controller.BackwardM2(get_controller_address(0), unit_range_to_controller(abs(right_y)))
+           test_controller.BackwardM2(unit_range_to_controller(abs(right_y)))
 
         # Sleep to allow some pause
         sleep(0.001)
@@ -74,7 +73,7 @@ def get_controller_address(id):
     return addrs[id]
 
 def unit_range_to_controller(value):
-    """Convert from 0 - 1 to 0 - 127 to accomidate the motor controller values"""
+    """Convert from 0 - 1 to 0 - 127 to accommodate the motor controller values"""
     return round(value * 127)
 
 if __name__ == "__main__":
