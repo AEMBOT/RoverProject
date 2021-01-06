@@ -848,7 +848,7 @@ class MCP:
 	def DutyAccelM2(self,accel,duty):
 		return self._writeS24(self.addr,self.Cmd.M2DUTYACCEL,duty,accel)
 
-	def DutyAccelM1M2(self,self.addr,accel1,duty1,accel2,duty2):
+	def DutyAccelM1M2(self,accel1,duty1,accel2,duty2):
 		return self._writeS24S24(self.Cmd.MIXEDDUTYACCEL,duty1,accel1,duty2,accel2)
 		
 	def ReadM1VelocityPID(self):
