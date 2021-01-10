@@ -2,10 +2,9 @@
 """Used to command the rover's motors and systems based on controller input"""
 
 import rospy
+from smbus2 import SMBus
 
 from rover_main.msg import controllerMap
-
-from motor_controllers.MCP import MCP
 
 from time import sleep
 import threading
@@ -36,11 +35,7 @@ def control_thread():
     global CONTROLLER_STATE
     # Get the global version of controller state
 
-    # Get the first controller address and set the serial port and baudrate and address
-    test_controller: MCP = MCP(comport="/dev/ttyS0", rate=38_400, addr=get_controller_address(0))
-
-    # Start communication with the specified controller
-    test_controller.Open()
+    I2Cbus = SMBus(1)
 
     # Wait for the controller values to populate
     while CONTROLLER_STATE == None:
@@ -49,32 +44,20 @@ def control_thread():
     # Simple test to run both motors 
     while not rospy.is_shutdown():
         left_y = float(CONTROLLER_STATE.Joystick_LeftY)
-        right_y = float(CONTROLLER_STATE.Joystick_RightY)
 
-        # Command Motor 1
-        if left_y > 0:
-           test_controller.ForwardM1(unit_range_to_controller(left_y))
-        else:
-           test_controller.BackwardM1(unit_range_to_controller(abs(left_y)))
+        left_y = int(unit_range_to_controller(left_y))
 
-        # Command Motor 2
-        if right_y > 0:
-           test_controller.ForwardM2(unit_range_to_controller(right_y))
-        else:
-           test_controller.BackwardM2(unit_range_to_controller(abs(right_y)))
+        I2Cbus.write_i2c_block_data(0x08, 0x00, bytes([left_y]))
 
         # Sleep to allow some pause
         sleep(0.001)
 
-def get_controller_address(id):
-    """Returns the correct address for the controller id 0 - 7"""
-
-    addrs = [0x80, 0x81, 0x82, 0x83, 0x84, 0x85, 0x86, 0x87]
-    return addrs[id]
-
 def unit_range_to_controller(value):
     """Convert from 0 - 1 to 0 - 127 to accommodate the motor controller values"""
-    return round(value * 127)
+    if value >= 0:
+        return round(value * 64)
+    else:
+        return (64 - round(value * 64))
 
 if __name__ == "__main__":
     # Thread to handle actions taken based on controller input
