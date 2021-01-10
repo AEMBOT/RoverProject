@@ -63,16 +63,16 @@ def control_thread():
         motor_speeds[1] = right_y
 
         # Create a slight deadzone so that you can easily stop the motors
-        for speed in motor_speeds:
-            if(speed <  70 and speed > 58):
-                speed = 64
+        for i in range(len(motor_speeds)):
+            if(motor_speeds[i] <  70 and motor_speeds[i] > 58):
+                motor_speeds[i] = 64
 
         if motor_speeds != last_motor_speed:
             print(motor_speeds)
             try:
                 I2Cbus.write_i2c_block_data(motor_control_arduino_addr, 0x00, bytes(motor_speeds))
-            except as e:
-                rospy.logerr("I2C Exception Occurred: %s"%e)
+            except:
+                rospy.logerr("I2C Exception Occurred")
 
         # Copy the previous loops motor_speeds to the last
         last_motor_speed = motor_speeds.copy()
