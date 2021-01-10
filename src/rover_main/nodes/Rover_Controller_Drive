@@ -69,7 +69,10 @@ def control_thread():
 
         if motor_speeds != last_motor_speed:
             print(motor_speeds)
-            I2Cbus.write_i2c_block_data(motor_control_arduino_addr, 0x00, bytes(motor_speeds))
+            try:
+                I2Cbus.write_i2c_block_data(motor_control_arduino_addr, 0x00, bytes(motor_speeds))
+            except as e:
+                rospy.logerr("I2C Exception Occurred: %s"%e)
 
         # Copy the previous loops motor_speeds to the last
         last_motor_speed = motor_speeds.copy()
