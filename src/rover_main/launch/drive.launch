@@ -1,0 +1,4 @@
+<!--Simulated Xbox controller using xboxdrv-->
+<launch>
+    <node name="RoverController" pkg="rover_main" type="Rover_Controller_Drive" output="screen"/>
+</launch>
