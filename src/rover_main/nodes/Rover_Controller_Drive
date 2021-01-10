@@ -13,6 +13,7 @@ CONTROLLER_STATE = None
 
 def control_topic_update(callback_data):
     global CONTROLLER_STATE
+    # print(callback_data)
     CONTROLLER_STATE = callback_data
 
 def create_node():
@@ -38,17 +39,23 @@ def control_thread():
     I2Cbus = SMBus(1)
 
     # Wait for the controller values to populate
-    while CONTROLLER_STATE == None:
+    while CONTROLLER_STATE == None and not rospy.is_shutdown():
         pass
-
+    last_val = 64
+    speed = 64
     # Simple test to run both motors 
     while not rospy.is_shutdown():
         left_y = float(CONTROLLER_STATE.Joystick_LeftY)
 
         left_y = int(unit_range_to_controller(left_y))
+        speed = left_y
+        if last_val != left_y:
+            if(left_y <  70 and left_y > 58):
+                speed = 64
 
-        I2Cbus.write_i2c_block_data(0x08, 0x00, bytes([left_y]))
-
+            print(speed)
+            I2Cbus.write_i2c_block_data(0x08, 0x00, bytes([speed]))
+        last_val = left_y
 def unit_range_to_controller(value):
     """Convert from 0 - 1 to 0 - 127 to accommodate the motor controller values"""
     if value >= 0:
