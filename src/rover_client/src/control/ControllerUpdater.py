@@ -58,7 +58,7 @@ def get_controller_states():
     global CONTROLLER_CONNECTED
 
     # If no controller was found on start idle until a controller is connected
-    while not CONTROLLER_CONNECTED and not rospy.is_shutdown():
+    while not CONTROLLER_CONNECTED and not rospy.is_shutdown():            
         rospy.loginfo("Searching For Controller...")
         try:
             # Get the first controller in the InputDevices
@@ -76,6 +76,12 @@ def get_controller_states():
 
     # Events are called when the button is pushed and when it is released
     while not rospy.is_shutdown():
+
+        try:
+            rospy.get_master().getPid()
+        except:
+            rospy.logfatal("Connection to roscore was lost, shutting down....")
+            rospy.signal_shutdown("Lost roscore connection")
 
         # Use the XBOX controller layout
         if CONTROLLER_TYPE == "xbox":
