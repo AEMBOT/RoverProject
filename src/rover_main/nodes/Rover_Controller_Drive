@@ -49,15 +49,14 @@ def control_thread():
 
         I2Cbus.write_i2c_block_data(0x08, 0x00, bytes([left_y]))
 
-        # Sleep to allow some pause
-        sleep(0.001)
-
 def unit_range_to_controller(value):
     """Convert from 0 - 1 to 0 - 127 to accommodate the motor controller values"""
     if value >= 0:
-        return round(value * 64)
+        if 64 + abs(round(value * 64)) > 127:
+            return 127
+        return (64 + abs(round(value * 64)))
     else:
-        return (64 - round(value * 64))
+        return (64 - abs(round(value * 64)))
 
 if __name__ == "__main__":
     # Thread to handle actions taken based on controller input
