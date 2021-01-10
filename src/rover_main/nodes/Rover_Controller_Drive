@@ -36,26 +36,43 @@ def control_thread():
     global CONTROLLER_STATE
     # Get the global version of controller state
 
+    # Get the first I2C bus on the rpi
     I2Cbus = SMBus(1)
 
-    # Wait for the controller values to populate
+    motor_control_arduino_addr = 0x08
+
+    # Arrays to hold individual motor values
+    motor_speeds = [64, 64, 64, 64, 64, 64]
+    last_motor_speed = [64, 64, 64, 64, 64, 64]
+
+    # Wait for the controller values to populate and make sure that ros is still running
     while CONTROLLER_STATE == None and not rospy.is_shutdown():
         pass
-    last_val = 64
-    speed = 64
+
     # Simple test to run both motors 
     while not rospy.is_shutdown():
         left_y = float(CONTROLLER_STATE.Joystick_LeftY)
+        right_y = float(CONTROLLER_STATE.Joystick_RightY)
 
+        # Convert to 0 - 127 range with 64 at 0
         left_y = int(unit_range_to_controller(left_y))
-        speed = left_y
-        if last_val != left_y:
-            if(left_y <  70 and left_y > 58):
+        right_y = int(unit_range_to_controller(right_y))
+
+        # Set the values in the motor_speed array to the controller inputs
+        motor_speeds[0] = left_y
+        motor_speeds[1] = right_y
+
+        # Create a slight deadzone so that you can easily stop the motors
+        for speed in motor_speeds:
+            if(speed <  70 and speed > 58):
                 speed = 64
 
-            print(speed)
-            I2Cbus.write_i2c_block_data(0x08, 0x00, bytes([speed]))
-        last_val = left_y
+        if motor_speeds != last_motor_speed:
+            print(motor_speeds)
+            I2Cbus.write_i2c_block_data(motor_control_arduino_addr, 0x00, bytes(motor_speeds))
+
+        # Copy the previous loops motor_speeds to the last
+        last_motor_speed = motor_speeds.copy()
 def unit_range_to_controller(value):
     """Convert from 0 - 1 to 0 - 127 to accommodate the motor controller values"""
     if value >= 0:
@@ -64,6 +81,7 @@ def unit_range_to_controller(value):
         return (64 + abs(round(value * 64)))
     else:
         return (64 - abs(round(value * 64)))
+
 
 if __name__ == "__main__":
     # Thread to handle actions taken based on controller input
