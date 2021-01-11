@@ -32,7 +32,6 @@ That being said the [ROS Wiki](http://wiki.ros.org) and it's [Tutorial Series ](
 
 # Useful Resources
 
-[ROS Project Structuring](http://www.artificialhumancompanions.com/structure-python-based-ros-package/)<br>
 [ROS Wiki](http://wiki.ros.org)<br>
 [ROS Forms](https://answers.ros.org/questions/)<br>
 
