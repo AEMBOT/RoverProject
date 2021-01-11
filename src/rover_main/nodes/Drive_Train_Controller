@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-"""Used to command the rover's motors and systems based on controller input"""
+"""Used to command the rover's drive train based on controller input"""
 
 import rospy
 from smbus2 import SMBus
