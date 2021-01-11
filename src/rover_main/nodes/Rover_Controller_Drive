@@ -11,6 +11,9 @@ import threading
 
 CONTROLLER_STATE = None
 
+# Global controller deadzone
+CONTROLLER_DEADZONE = 6
+
 def control_topic_update(callback_data):
     global CONTROLLER_STATE
     # print(callback_data)
@@ -33,12 +36,13 @@ def create_node():
     rospy.spin()
 
 def control_thread():
-    global CONTROLLER_STATE
     # Get the global version of controller state
+    global CONTROLLER_STATE
 
     # Get the first I2C bus on the rpi
     I2Cbus = SMBus(1)
 
+    # Set the I2C address that the slave arduino is located at
     motor_control_arduino_addr = 0x08
 
     # Arrays to hold individual motor values
@@ -51,6 +55,8 @@ def control_thread():
 
     # Simple test to run both motors 
     while not rospy.is_shutdown():
+
+        # For this test get the left and right Y joystick values
         left_y = float(CONTROLLER_STATE.Joystick_LeftY)
         right_y = float(CONTROLLER_STATE.Joystick_RightY)
 
@@ -62,22 +68,28 @@ def control_thread():
         motor_speeds[0] = left_y
         motor_speeds[1] = right_y
 
-        # Create a slight deadzone so that you can easily stop the motors
+        # Create a slight deadzone so that you can easily stop the motors (A standard foreach loop wasn't working here)
         for i in range(len(motor_speeds)):
-            if(motor_speeds[i] <  70 and motor_speeds[i] > 58):
+            if(motor_speeds[i] <  64 + CONTROLLER_DEADZONE and motor_speeds[i] > 64 - CONTROLLER_DEADZONE):
                 motor_speeds[i] = 64
 
+        # Check to verify if we do actually need to send new data
         if motor_speeds != last_motor_speed:
+
+            # Print out the motor speeds (for debug, can remove later but doesn't really matter) 
             print(motor_speeds)
+
+            # Wrap the I2C write call in a try/except. 
+            # It will occasionally throw an I/O exception, which mainly means a single command didn't get sent however it can be caught and the program can continue without issue
             try:
                 I2Cbus.write_i2c_block_data(motor_control_arduino_addr, 0x00, bytes(motor_speeds))
-            except:
-                rospy.logerr("I2C Exception Occurred")
+            except Exception as e:
+                rospy.logerr(f"I2C Exception Occurred: {e}")
 
         # Copy the previous loops motor_speeds to the last
         last_motor_speed = motor_speeds.copy()
 def unit_range_to_controller(value):
-    """Convert from 0 - 1 to 0 - 127 to accommodate the motor controller values"""
+    """Convert from 0 - 1 to 0 - 127 with 64 in the middle to accommodate the motor controller values"""
     if value >= 0:
         if 64 + abs(round(value * 64)) > 127:
             return 127

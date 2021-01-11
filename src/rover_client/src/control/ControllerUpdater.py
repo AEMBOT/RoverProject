@@ -68,6 +68,7 @@ def get_controller_states():
         except Exception as e:
             rospy.logerr("No Controller Detected: %s, Retrying in 2 seconds..."%e)
             sleep(2)
+
             # Update pygame
             pygame.event.pump()
 
@@ -77,11 +78,10 @@ def get_controller_states():
     # Events are called when the button is pushed and when it is released
     while not rospy.is_shutdown():
 
-        try:
-            rospy.get_master().getPid()
-        except:
-            rospy.logfatal("Connection to roscore was lost, shutting down....")
-            rospy.signal_shutdown("Lost roscore connection")
+        # Check if the remote roscore is still running
+        if not is_roscore_running():
+            rospy.logfatal("Failed to connect to roscore! Exiting...")
+            rospy.signal_shutdown("Lost Connection to ros master")
 
         # Use the XBOX controller layout
         if CONTROLLER_TYPE == "xbox":
@@ -125,7 +125,6 @@ def get_controller_states():
             else:
                 CONTROLLER_DICT["Key_Dpad_Up"] = False
                 CONTROLLER_DICT["Key_Dpad_Down"] = False
-
 
 
             # Left Joystick X
@@ -189,8 +188,6 @@ def get_controller_states():
             else:
                 CONTROLLER_DICT["Key_Dpad_Up"] = False
                 CONTROLLER_DICT["Key_Dpad_Down"] = False
-
-
 
             # Left Joystick X
             CONTROLLER_DICT["Joystick_LeftX"] = controller.get_axis(0)
@@ -256,7 +253,17 @@ def convert_trigger_xbox(value):
     return (value)
 
 def convert_trigger_xbox_sim(value):
-    """Convert the trigger to ranges from 0 to 1"""
+    """Convert the trigger to ranges from 0 to 1, for non-standard Xbox controllers (mainly those run through xboxdrv)"""
     value += 1
     value /= 2
     return (value)
+
+def is_roscore_running():
+    """Returns wether or not the roscore is running"""
+    roscore_running = True
+    try:
+        # Get the proc. ID of the remote roscore, if it fails it means the remote core is dead
+        rospy.get_master().getPid()
+    except:
+        roscore_running = False
+    return roscore_running
