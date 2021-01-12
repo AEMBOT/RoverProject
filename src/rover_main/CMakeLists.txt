@@ -57,6 +57,7 @@ add_message_files(
 add_service_files(
    FILES
    RobotStatus.srv
+   I2C_Service.srv
  )
 
 ## Generate actions in the 'action' folder
