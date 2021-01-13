@@ -3,6 +3,9 @@ int32[] i2c_data
 
 # The device of the I2C address set to recieve this data
 int32 device_address
+
+# Register ID
+int32 register_id
 ---
 
 # Returns response data (if any) from the device

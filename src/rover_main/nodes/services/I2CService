@@ -1,0 +1,50 @@
+#!/usr/bin/python3
+
+import rospy
+
+from smbus2 import SMBus
+
+from rover_main.srv import I2C_Service, I2C_ServiceResponse
+
+from time import sleep
+
+# Get the first I2C bus on the rpi
+I2Cbus: SMBus = SMBus(1)
+
+def on_service_contact(data):
+    """When I2C data needs to be transmitted it will be sent here"""
+
+    # Create easy to use local instances of the received data
+    i2c_data = data.i2c_data
+    device_address = data.device_address
+    register_id = data.register_id
+    
+    # Write the requested data to the I2C bus 
+    I2Cbus.write_i2c_block_data(device_address, register_id, bytes(list(i2c_data)))
+
+    # Log the info being sent
+    rospy.loginfo(f"Sending {i2c_data} to device {device_address} with the register id of {register_id}")
+
+    # Return 0 if register is 0 as we are commanding motors
+    if register_id == 0:
+        return I2C_ServiceResponse([0])
+
+    # NOTE: Depending on register ID we need to read different lengths of data yet when that is implemented
+    # sleep(0.1)
+    # return I2C_ServiceResponse(I2Cbus.read_i2c_block_data(device_address, register_id, length=32))
+
+def init_node():
+    # Create a new node to handle the I2C Service
+    rospy.init_node("I2C", anonymous=True)
+
+    # Create the service to listen for data
+    service = rospy.Service("I2C_Service", service_class=I2C_Service, handler=on_service_contact)
+
+    # Notify that we are waiting for requests
+    rospy.loginfo("Waiting for requests...")
+
+    # Setup handlers/callbacks
+    rospy.spin()
+
+if __name__ == "__main__":
+    init_node()

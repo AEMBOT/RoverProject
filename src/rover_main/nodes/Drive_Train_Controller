@@ -2,9 +2,10 @@
 """Used to command the rover's drive train based on controller input"""
 
 import rospy
-from smbus2 import SMBus
+
 
 from rover_main.msg import controllerMap
+from rover_main.srv import I2C_Service,
 
 from time import sleep
 import threading
@@ -39,15 +40,16 @@ def control_thread():
     # Get the global version of controller state
     global CONTROLLER_STATE
 
-    # Get the first I2C bus on the rpi
-    I2Cbus = SMBus(1)
-
     # Set the I2C address that the slave arduino is located at
     motor_control_arduino_addr = 0x08
 
     # Arrays to hold individual motor values
     motor_speeds = [64, 64, 64, 64, 64, 64]
     last_motor_speed = [64, 64, 64, 64, 64, 64]
+
+    # Block until the I2C service is ready and then connect so that data can be sent and received
+    rospy.wait_for_service("I2C_Service")
+    i2c_service = rospy.ServiceProxy("I2C_Service", service_class=I2C_Service, persistent=True)
 
     # Wait for the controller values to populate and make sure that ros is still running
     while CONTROLLER_STATE == None and not rospy.is_shutdown():
@@ -82,7 +84,8 @@ def control_thread():
             # Wrap the I2C write call in a try/except. 
             # It will occasionally throw an I/O exception, which mainly means a single command didn't get sent however it can be caught and the program can continue without issue
             try:
-                I2Cbus.write_i2c_block_data(motor_control_arduino_addr, 0x00, bytes(motor_speeds))
+                # Use a single I2C service to localize all communication over the I2C bus
+                i2c_service(i2c_data=bytes(motor_speeds), device_address=motor_control_arduino_addr, register_id=0)
             except Exception as e:
                 rospy.logerr(f"I2C Exception Occurred: {e}")
 

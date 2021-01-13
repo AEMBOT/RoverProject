@@ -164,6 +164,9 @@ catkin_install_python(PROGRAMS
 
   # Drive Train Nodes
   nodes/Drive_Train_Controller
+
+  # I2C services
+  nodes/services/I2CService
 )
 
 ## Mark executables for installation
