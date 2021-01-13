@@ -5,7 +5,7 @@ import rospy
 
 
 from rover_main.msg import controllerMap
-from rover_main.srv import I2C_Service,
+from rover_main.srv import I2C_Service
 
 from time import sleep
 import threading
