@@ -63,7 +63,7 @@ def get_controller_states():
         rospy.loginfo("No Controller Detected: %s"%e)
         return
     
-    # Use the XBOX controller layout
+    # Select the correct controller layout
     if CONTROLLER_TYPE == "xbox":
         joystick = Xbox(controller)
 

@@ -1,30 +1,5 @@
 class Xbox:
 
-    # Local dictionary of the state of the controller
-    CONTROLLER_DICT = {
-
-        # Boolean Switches
-        "Key_X" : False,
-        "Key_Square" : False,
-        "Key_Circle" : False,
-        "Key_Triangle" : False,
-        "Key_Dpad_Left" : False,
-        "Key_Dpad_Right" : False,
-        "Key_Dpad_Up" : False,
-        "Key_Dpad_Down" : False,
-        "Key_Bumper_Left" : False,
-        "Key_Bumper_Right" : False,
-
-        # Analog values
-        "Joystick_LeftX" : 0.0,
-        "Joystick_LeftY" : 0.0,
-        "Joystick_RightX" : 0.0,
-        "Joystick_RightY" : 0.0,
-        "Trigger_Left" : 0.0,
-        "Trigger_Right" : 0.0,
-
-    }
-
     def __init__(self, controller):
         """
         controller: Reference to the previously created controller object to read data from
@@ -34,6 +9,9 @@ class Xbox:
     def update_controller(self, controller):
         """Updates the controller values at the start of the loop"""
         self.controller = controller
+
+    def get_controller(self):
+        return self.controller
 
     # Button Inputs
 
@@ -99,14 +77,8 @@ class Xbox:
     
     def get_left_trigger(self):
         return self.__remap(self.controller.get_axis(2), (-1, 1), (0, 1))
-
-    def convert_trigger(self, value):
-        """Convert the trigger to ranges from 0 to 1"""
-        if value < 0:
-            value = 0
-        return (value)
     
-    def __remap(self, old_val, old_range: tuple, new_range: tuple):
+    def remap(self, old_val, old_range: tuple, new_range: tuple):
         """Remaps a range of numbers to fit that of a new range"""
         return (new_range[1] - new_range[0])*(old_val - old_range[0]) / (old_range[1] - old_range[0]) + new_range[0]
 
