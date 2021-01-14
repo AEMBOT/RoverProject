@@ -6,8 +6,11 @@ import threading
 
 from rover_main.msg import controllerMap
 
-CONTROLLER_TYPE = ""
+from control.controllers.Xbox import Xbox
+from control.controllers.SimulatedXbox import SimulatedXbox
 
+
+CONTROLLER_TYPE = ""
 # Local dictionary of the state of the controller
 CONTROLLER_DICT = {
 
@@ -42,7 +45,7 @@ def start_controller_monitor():
     # The launch file contains a parameter to set the correct controller type
     global CONTROLLER_TYPE
     CONTROLLER_TYPE = rospy.get_param("controller_type").strip()
-       
+    
     # Create and start the asynico thread
     thread = threading.Thread(target=get_controller_states, args=())
     thread.start()
@@ -59,6 +62,13 @@ def get_controller_states():
     except Exception as e:
         rospy.loginfo("No Controller Detected: %s"%e)
         return
+    
+    # Use the XBOX controller layout
+    if CONTROLLER_TYPE == "xbox":
+        joystick = Xbox(controller)
+
+    elif CONTROLLER_TYPE == "sim_xbox":
+        joystick = SimulatedXbox(controller)
 
     # Refernce the global CONTROLLER_DICT to be used locally
     global CONTROLLER_DICT
@@ -66,134 +76,60 @@ def get_controller_states():
     # Events are called when the button is pushed and when it is released
     while not rospy.is_shutdown():
 
-        # Use the XBOX controller layout
-        if CONTROLLER_TYPE == "xbox":
+        # Update the current joystick inputs
+        joystick.update_controller(controller)
 
-            # X / A
-            CONTROLLER_DICT["Key_X"] = bool(controller.get_button(0))
+        # X / A
+        CONTROLLER_DICT["Key_X"] = joystick.get_button_A()
 
-            # Circle / B
-            CONTROLLER_DICT["Key_Circle"] = bool(controller.get_button(1))
+        # Circle / B
+        CONTROLLER_DICT["Key_Circle"] = joystick.get_button_B()
 
-            # Triangle / X
-            CONTROLLER_DICT["Key_Triangle"] = bool(controller.get_button(3))
+        # Triangle / X
+        CONTROLLER_DICT["Key_Triangle"] = joystick.get_button_X()
 
-            # Square / Y
-            CONTROLLER_DICT["Key_Square"] = bool(controller.get_button(2))
-            
-            # Left Bumper
-            CONTROLLER_DICT["Key_Bumper_Left"] = bool(controller.get_button(4))
+        # Square / Y
+        CONTROLLER_DICT["Key_Square"] = joystick.get_button_Y()
+        
+        # Left Bumper
+        CONTROLLER_DICT["Key_Bumper_Left"] = joystick.get_left_bumper()
 
-            # Right Bumper
-            CONTROLLER_DICT["Key_Bumper_Right"] = bool(controller.get_button(5))
+        # Right Bumper
+        CONTROLLER_DICT["Key_Bumper_Right"] = joystick.get_right_bumper()
 
-            # Dpad-Parser (Left / Right)
-            if controller.get_hat(0)[0] > 0.2:
-                CONTROLLER_DICT["Key_Dpad_Right"] = True
-                CONTROLLER_DICT["Key_Dpad_Left"] = False
-            elif controller.get_hat(0)[0] < -0.2:
-                CONTROLLER_DICT["Key_Dpad_Right"] = False
-                CONTROLLER_DICT["Key_Dpad_Left"] = True
-            else:
-                CONTROLLER_DICT["Key_Dpad_Right"] = False
-                CONTROLLER_DICT["Key_Dpad_Left"] = False
+        # Dpad 
 
-            # Dpad-Parser (Up / Down)
-            if controller.get_hat(0)[1] > 0.2:
-                CONTROLLER_DICT["Key_Dpad_Up"] = True
-                CONTROLLER_DICT["Key_Dpad_Down"] = False
-            elif controller.get_hat(0)[1] < -0.2:
-                CONTROLLER_DICT["Key_Dpad_Up"] = False
-                CONTROLLER_DICT["Key_Dpad_Down"] = True
-            else:
-                CONTROLLER_DICT["Key_Dpad_Up"] = False
-                CONTROLLER_DICT["Key_Dpad_Down"] = False
+        # Right Dpad
+        CONTROLLER_DICT["Key_Dpad_Right"] = joystick.get_dpad_right()
+
+        # Left Dpad
+        CONTROLLER_DICT["Key_Dpad_Left"] = joystick.get_dpad_left()
+        
+        # Up Dpad
+        CONTROLLER_DICT["Key_Dpad_Up"] = joystick.get_dpad_up()
+
+        # Down Dpad
+        CONTROLLER_DICT["Key_Dpad_Down"] = joystick.get_dpad_down()
 
 
+        # Left Joystick X
+        CONTROLLER_DICT["Joystick_LeftX"] = joystick.get_joystick_left_x()
+        
 
-            # Left Joystick X
-            CONTROLLER_DICT["Joystick_LeftX"] = controller.get_axis(0)
-            
+        # Left Joystick Y
+        CONTROLLER_DICT["Joystick_LeftY"] = joystick.get_joystick_left_y()
 
-            # Left Joystick Y
-            CONTROLLER_DICT["Joystick_LeftY"] = controller.get_axis(1)
+        # Right Joystick X
+        CONTROLLER_DICT["Joystick_RightX"] = joystick.get_joystick_right_x()
 
-            # Right Joystick X
-            CONTROLLER_DICT["Joystick_RightX"] = controller.get_axis(3)
+        # Right Joystick Y
+        CONTROLLER_DICT["Joystick_RightY"] = joystick.get_joystick_right_y()
 
-            # Right Joystick Y
-            CONTROLLER_DICT["Joystick_RightY"] = controller.get_axis(4)
+        # Right Trigger
+        CONTROLLER_DICT["Trigger_Right"] = joystick.get_right_trigger()
 
-            # Right Trigger
-            CONTROLLER_DICT["Trigger_Right"] = convert_trigger_xbox(controller.get_axis(5))
-
-            # Left Trigger
-            CONTROLLER_DICT["Trigger_Left"] = convert_trigger_xbox(controller.get_axis(2))
-
-        # Xboxdrv simulated controller
-        elif CONTROLLER_TYPE == "sim_xbox":
-            
-            # X / A
-            CONTROLLER_DICT["Key_X"] = bool(controller.get_button(0))
-
-            # Circle / B
-            CONTROLLER_DICT["Key_Circle"] = bool(controller.get_button(1))
-
-            # Triangle / X
-            CONTROLLER_DICT["Key_Triangle"] = bool(controller.get_button(3))
-
-            # Square / Y
-            CONTROLLER_DICT["Key_Square"] = bool(controller.get_button(2))
-            
-            # Left Bumper
-            CONTROLLER_DICT["Key_Bumper_Left"] = bool(controller.get_button(4))
-
-            # Right Bumper
-            CONTROLLER_DICT["Key_Bumper_Right"] = bool(controller.get_button(5))
-
-            # Dpad-Parser (Left / Right)
-            if controller.get_hat(0)[0] > 0.2:
-                CONTROLLER_DICT["Key_Dpad_Right"] = True
-                CONTROLLER_DICT["Key_Dpad_Left"] = False
-            elif controller.get_hat(0)[0] < -0.2:
-                CONTROLLER_DICT["Key_Dpad_Right"] = False
-                CONTROLLER_DICT["Key_Dpad_Left"] = True
-            else:
-                CONTROLLER_DICT["Key_Dpad_Right"] = False
-                CONTROLLER_DICT["Key_Dpad_Left"] = False
-
-            # Dpad-Parser (Up / Down)
-            if controller.get_hat(0)[1] > 0.2:
-                CONTROLLER_DICT["Key_Dpad_Up"] = True
-                CONTROLLER_DICT["Key_Dpad_Down"] = False
-            elif controller.get_hat(0)[1] < -0.2:
-                CONTROLLER_DICT["Key_Dpad_Up"] = False
-                CONTROLLER_DICT["Key_Dpad_Down"] = True
-            else:
-                CONTROLLER_DICT["Key_Dpad_Up"] = False
-                CONTROLLER_DICT["Key_Dpad_Down"] = False
-
-
-
-            # Left Joystick X
-            CONTROLLER_DICT["Joystick_LeftX"] = controller.get_axis(0)
-            
-
-            # Left Joystick Y
-            CONTROLLER_DICT["Joystick_LeftY"] = -controller.get_axis(1)
-
-            # Right Joystick X
-            CONTROLLER_DICT["Joystick_RightX"] = controller.get_axis(2)
-
-            # Right Joystick Y
-            CONTROLLER_DICT["Joystick_RightY"] = -controller.get_axis(3)
-
-            # Right Trigger
-            CONTROLLER_DICT["Trigger_Right"] = convert_trigger_xbox_sim(controller.get_axis(4))
-
-            # Left Trigger
-            CONTROLLER_DICT["Trigger_Left"] = convert_trigger_xbox_sim(controller.get_axis(5))
-
+        # Left Trigger
+        CONTROLLER_DICT["Trigger_Left"] = joystick.get_left_trigger()
 
         # Register new events
         pygame.event.pump()
@@ -231,15 +167,3 @@ def getCurrentControllerState():
     controller_state.Trigger_Right = CONTROLLER_DICT["Trigger_Right"]
 
     return controller_state
-
-def convert_trigger_xbox(value):
-    """Convert the trigger to ranges from 0 to 1"""
-    if value < 0:
-        value = 0
-    return (value)
-
-def convert_trigger_xbox_sim(value):
-    """Convert the trigger to ranges from 0 to 1"""
-    value += 1
-    value /= 2
-    return (value)

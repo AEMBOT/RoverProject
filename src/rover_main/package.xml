@@ -9,6 +9,8 @@
   <!-- <maintainer email="jane.doe@example.com">Jane Doe</maintainer> -->
   <maintainer email="jwilt9000@gmail.com">Will Richards</maintainer>
 
+  <license>TODO</license>
+
   <!-- The *depend tags are used to specify dependencies -->
   <!-- Dependencies can be catkin packages or system dependencies -->
   <buildtool_depend>catkin</buildtool_depend>
