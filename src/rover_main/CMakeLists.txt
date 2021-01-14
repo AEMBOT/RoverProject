@@ -56,7 +56,9 @@ add_message_files(
 ## Generate services in the 'srv' folder
 add_service_files(
    FILES
-   RobotStatus.srv
+
+   # Handles I2C driver communication
+   i2c_comms.srv
  )
 
 ## Generate actions in the 'action' folder
@@ -159,6 +161,8 @@ include_directories(
 ## Mark executable scripts (Python etc.) for installation
 ## in contrast to setup.py, you can choose the destination
 catkin_install_python(PROGRAMS
+  nodes/services/I2C_Service
+  scripts/communication/I2C_Service_Test
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
