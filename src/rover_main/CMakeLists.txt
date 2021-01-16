@@ -56,8 +56,8 @@ add_message_files(
 ## Generate services in the 'srv' folder
 add_service_files(
    FILES
-   RobotStatus.srv
    I2C_Service.srv
+   DriveTrainService.srv
  )
 
 ## Generate actions in the 'action' folder
@@ -160,12 +160,13 @@ include_directories(
 ## Mark executable scripts (Python etc.) for installation
 ## in contrast to setup.py, you can choose the destination
 catkin_install_python(PROGRAMS
-  nodes/services/I2C_Service
-  scripts/communication/I2C_Service_Test
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 
+  # Drive Train Controller Services
+  nodes/services/DriveTrainController
+
   # Drive Train Nodes
-  nodes/Drive_Train_Controller
+  nodes/TeleopController
 
   # I2C services
   nodes/services/I2CService

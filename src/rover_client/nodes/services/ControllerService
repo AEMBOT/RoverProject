@@ -28,7 +28,7 @@ def start_service():
     ControllerUpdater.start_controller_monitor()
 
     # Announce that the setup is complete
-    rospy.loginfo_once("Awaiting Controller Input...")
+    rospy.loginfo_once(f"{rospy.get_name()}: Awaiting Controller Input...")
 
     # Wait until the service is terminted
     rospy.spin()

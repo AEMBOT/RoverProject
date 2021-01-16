@@ -5,7 +5,7 @@ import rospy
 
 
 from rover_main.msg import controllerMap
-from rover_main.srv import I2C_Service
+from rover_main.srv import DriveTrainService
 
 from time import sleep
 import threading
@@ -13,7 +13,7 @@ import threading
 CONTROLLER_STATE = None
 
 # Global controller deadzone
-CONTROLLER_DEADZONE = 6
+CONTROLLER_DEADZONE = 0.05
 
 def control_topic_update(callback_data):
     global CONTROLLER_STATE
@@ -24,14 +24,14 @@ def create_node():
     """Starts the node and subscribes the required data topics"""
 
     # Create a new network communication node
-    rospy.init_node("rover_network_comms", anonymous=True)
+    rospy.init_node("teleop_controller", anonymous=True)
 
     # Subscribe to the controller topic to get information from
     rospy.Subscriber(name="controller_state",
                      data_class=controllerMap,
                      callback=control_topic_update,
                      queue_size=1000)
-    rospy.loginfo("Started Node...")
+    rospy.loginfo(f"{rospy.get_name()} Started...")
 
     # Register subscriber events
     rospy.spin()
@@ -40,16 +40,12 @@ def control_thread():
     # Get the global version of controller state
     global CONTROLLER_STATE
 
-    # Set the I2C address that the slave arduino is located at
-    motor_control_arduino_addr = 0x08
-
     # Arrays to hold individual motor values
     motor_speeds = [64, 64, 64, 64, 64, 64]
-    last_motor_speed = [64, 64, 64, 64, 64, 64]
 
     # Block until the I2C service is ready and then connect so that data can be sent and received
-    rospy.wait_for_service("I2C_Service")
-    i2c_service = rospy.ServiceProxy("I2C_Service", service_class=I2C_Service, persistent=True)
+    rospy.wait_for_service("drive_train_controller")
+    drive_train_controller = rospy.ServiceProxy("drive_train_controller", service_class=DriveTrainService, persistent=True)
 
     # Wait for the controller values to populate and make sure that ros is still running
     while CONTROLLER_STATE == None and not rospy.is_shutdown():
@@ -62,43 +58,18 @@ def control_thread():
         left_y = float(CONTROLLER_STATE.Joystick_LeftY)
         right_y = float(CONTROLLER_STATE.Joystick_RightY)
 
-        # Convert to 0 - 127 range with 64 at 0
-        left_y = int(unit_range_to_controller(left_y))
-        right_y = int(unit_range_to_controller(right_y))
-
         # Set the values in the motor_speed array to the controller inputs
         motor_speeds[0] = left_y
         motor_speeds[1] = right_y
 
         # Create a slight deadzone so that you can easily stop the motors (A standard foreach loop wasn't working here)
         for i in range(len(motor_speeds)):
-            if(motor_speeds[i] <  64 + CONTROLLER_DEADZONE and motor_speeds[i] > 64 - CONTROLLER_DEADZONE):
-                motor_speeds[i] = 64
+            if(motor_speeds[i] <  0 + CONTROLLER_DEADZONE and motor_speeds[i] > 0 - CONTROLLER_DEADZONE):
+                motor_speeds[i] = 0
 
-        # Check to verify if we do actually need to send new data
-        if motor_speeds != last_motor_speed:
 
-            # Print out the motor speeds (for debug, can remove later but doesn't really matter) 
-            print(motor_speeds)
-
-            # Wrap the I2C write call in a try/except. 
-            # It will occasionally throw an I/O exception, which mainly means a single command didn't get sent however it can be caught and the program can continue without issue
-            try:
-                # Use a single I2C service to localize all communication over the I2C bus
-                i2c_service(i2c_data=bytes(motor_speeds), device_address=motor_control_arduino_addr, register_id=0)
-            except Exception as e:
-                rospy.logerr(f"I2C Exception Occurred: {e}")
-
-        # Copy the previous loops motor_speeds to the last
-        last_motor_speed = motor_speeds.copy()
-def unit_range_to_controller(value):
-    """Convert from 0 - 1 to 0 - 127 with 64 in the middle to accommodate the motor controller values"""
-    if value >= 0:
-        if 64 + abs(round(value * 64)) > 127:
-            return 127
-        return (64 + abs(round(value * 64)))
-    else:
-        return (64 - abs(round(value * 64)))
+        rospy.loginfo(drive_train_controller(motor_speeds=motor_speeds))
+        
 
 
 if __name__ == "__main__":

@@ -40,8 +40,8 @@ def init_node():
     # Create the service to listen for data
     service = rospy.Service("I2C_Service", service_class=I2C_Service, handler=on_service_contact)
 
-    # Notify that we are waiting for requests
-    rospy.loginfo("Waiting for requests...")
+    # Used to distinguish output from a launch file
+    rospy.loginfo(f"{rospy.get_name()} awaiting instruction...")
 
     # Setup handlers/callbacks
     rospy.spin()

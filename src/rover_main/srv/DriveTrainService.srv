@@ -1,0 +1,12 @@
+# Handles all data that is sent to the drive train to control it
+
+# Motor inputs on the range of -1 to 1
+float32[] motor_speeds
+
+# Angle inputs for the servos in terms of degrees
+float32[] wheel_angles
+
+---
+
+# Meant for returning errors encountered
+string response
