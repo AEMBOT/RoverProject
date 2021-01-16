@@ -16,8 +16,8 @@ LAST_MOTOR_SPEEDS = []
 
 def on_service_contact(data):
     global LAST_MOTOR_SPEEDS
-    motor_speeds = data.motor_speeds
-    wheel_angles = data.wheel_angles
+    motor_speeds = list(data.motor_speeds)
+    wheel_angles = list(data.wheel_angles)
 
     # Loop through the motor speeds and prepare the data to be sent to the arduino
     for value, i in enumerate(motor_speeds):
