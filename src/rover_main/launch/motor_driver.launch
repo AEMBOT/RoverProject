@@ -1,5 +1,6 @@
 <!--Used to start both the roscore and the driver in the same terminal-->
 <launch>
     <node name="I2CService" pkg="rover_main" type="I2CService" output="screen"/>
+    <node name="DriveTrainController" pkg="rover_main" type="DriveTrainController" output="screen"/>
     <node name="TeleopController" pkg="rover_main" type="TeleopController" output="screen"/>
 </launch>
