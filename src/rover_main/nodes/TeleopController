@@ -70,7 +70,7 @@ def control_thread():
         try:
             rospy.loginfo(drive_train_controller(motor_speeds=motor_speeds))
         except rospy.ServiceException as e:
-            rospy.logfatal(f"Service Exception Occurred: {e}")
+            rospy.logfatal_once(f"Service Exception Occurred: {e}")
         
 
 
