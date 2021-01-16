@@ -5,7 +5,7 @@ import rospy
 from rover_main.srv import DriveTrainService, DriveTrainServiceResponse
 from rover_main.srv import I2C_Service
 
-from communication.I2C_Register_Enum import I2CRegisterID
+from communication. I2C_Register_Enum import *
 
 # Address that the arduino is located at on the I2C bus
 CONTROL_ARDUINO_ADDRESS = 0x08
