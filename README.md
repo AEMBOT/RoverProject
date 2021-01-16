@@ -4,12 +4,15 @@ Repository for AEMBOT's 2020 rover written using ROS and Python
 
 # Installing ROS
 
-**I would highly recomend using a machine dual booted with Ubuntu. However with that said make sure that machine returns a reasonably low ping**
+**I would highly recommend using a machine dual booted with Ubuntu. However with that said make sure that machine returns a reasonably low ping**
+
 If it its average is > 300ms check in windows, if that is lower install for Windows
 
 This project makes use of [ROS Noetic](http://wiki.ros.org/noetic/Installation) which can be found on the ROS website or at that link
 
-After the install add the following to an environement variable named PYTHONPATH
+
+After the install add the following to an environment variable named PYTHONPATH (if you're on Windows):
+
 1. C:\opt\workspaces\RoverProject\src\rover_client\src
 2. C:\opt\workspaces\RoverProject\src\rover_main\src
 
@@ -33,4 +36,4 @@ You can also always ask me (Will) for help.
 
 # Workspace Setup Suggestions
 
-1. I would recomend setting up several virtual desktops to swap between to allow for more workspace
+1. I would recommend setting up several virtual desktops to swap between to allow for more workspace

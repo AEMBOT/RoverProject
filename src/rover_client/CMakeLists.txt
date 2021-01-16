@@ -161,12 +161,9 @@ include_directories(
 ## Mark executable scripts (Python etc.) for installation
 ## in contrast to setup.py, you can choose the destination
 catkin_install_python(PROGRAMS
-  # GUI Programs
-  nodes/gui/RoverDriverStation
-  # Rover Control
-  nodes/ControllerNode
+  # Controller Inputs
   nodes/services/ControllerService
-  scripts/ControllerTopicTester
+  nodes/ControllerPublisher
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 

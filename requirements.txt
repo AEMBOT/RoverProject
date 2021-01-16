@@ -1,2 +1,8 @@
+# Joystick Input Control Is Handled via pygame
 pygame
-pyserial
+
+# I2C Controller
+smbus2
+
+# Adafruit PWM Library
+adafruit-circuitpython-servokit

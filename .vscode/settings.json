@@ -9,6 +9,7 @@
         "PYTHONPATH": "${workspaceFolder}/src/rover_main/src:${workspaceFolder}/src/rover_client/src",
     },
     "python.envFile": "${workspaceFolder}/.env",
+  
     "ros.distro": "noetic",
     "python.autoComplete.extraPaths": [
         "${workspaceFolder}devel/lib/python3/dist-packages",
@@ -16,5 +17,5 @@
     ],
     "cSpell.words": [
         "comms"
-    ],
+  ],
 }

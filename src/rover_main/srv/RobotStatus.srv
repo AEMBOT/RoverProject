@@ -1,8 +1,0 @@
-# Service that runs on the rover waiting for updates to the current robot state
-
-# State of rover
-bool roverEnabled
----
-
-# Return string, will return the exception if one occured
-string responseStr
