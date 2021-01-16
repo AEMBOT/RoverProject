@@ -133,3 +133,13 @@ def getCurrentControllerState():
 
     global CONTROLLER_STATE
     return CONTROLLER_STATE
+
+def is_roscore_running():
+    """Returns wether or not the roscore is running"""
+    roscore_running = True
+    try:
+        # Get the proc. ID of the remote roscore, if it fails it means the remote core is dead
+        rospy.get_master().getPid()
+    except:
+        roscore_running = False
+    return roscore_running

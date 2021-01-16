@@ -67,8 +67,10 @@ def control_thread():
             if(motor_speeds[i] <  0 + CONTROLLER_DEADZONE and motor_speeds[i] > 0 - CONTROLLER_DEADZONE):
                 motor_speeds[i] = 0
 
-
-        rospy.loginfo(drive_train_controller(motor_speeds=motor_speeds))
+        try:
+            rospy.loginfo(drive_train_controller(motor_speeds=motor_speeds))
+        except rospy.ServiceException as e:
+            rospy.logfatal(f"Service Exception Occurred: {e}")
         
 
 
