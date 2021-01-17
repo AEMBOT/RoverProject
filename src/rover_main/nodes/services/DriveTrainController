@@ -1,9 +1,15 @@
 #!/usr/bin/python3
 
 import rospy
+import enum
 
 from rover_main.srv import DriveTrainService, DriveTrainServiceResponse
 from rover_main.srv import I2C_Service
+
+class I2CRegisterID(enum.Enum):
+    """Maps variable names to the corresponding register ids"""
+    DriveMotors = 0
+    TurnServos = 1
 
 # Address that the arduino is located at on the I2C bus
 CONTROL_ARDUINO_ADDRESS = 0x08
@@ -26,7 +32,7 @@ def on_service_contact(data):
     # Check to see if the motor values have actually changed
     if motor_speeds != LAST_MOTOR_SPEEDS:
         try:
-            I2C_SERVICE(i2c_data=bytes(motor_speeds), register_id=0, device_address=CONTROL_ARDUINO_ADDRESS)
+            I2C_SERVICE(i2c_data=bytes(motor_speeds), register_id=I2CRegisterID.DriveMotors, device_address=CONTROL_ARDUINO_ADDRESS)
             return DriveTrainServiceResponse("Request Executed Successfully")
         except Exception as e:
             return DriveTrainServiceResponse(f"I2C Exception Occurred: {e}")
