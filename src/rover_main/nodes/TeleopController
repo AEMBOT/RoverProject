@@ -17,7 +17,8 @@ CONTROLLER_DEADZONE = 0.05
 
 def control_topic_update(callback_data):
     global CONTROLLER_STATE
-    # print(callback_data)
+    
+    # Set the data from the controller_state topic equal to a global variable that is accessed from controlling thread
     CONTROLLER_STATE = callback_data
 
 def create_node():
@@ -41,7 +42,7 @@ def control_thread():
     global CONTROLLER_STATE
 
     # Arrays to hold individual motor values
-    motor_speeds = [64, 64, 64, 64, 64, 64]
+    motor_speeds = [0, 0, 0, 0, 0, 0]
 
     # Block until the I2C service is ready and then connect so that data can be sent and received
     rospy.wait_for_service("drive_train_controller")
