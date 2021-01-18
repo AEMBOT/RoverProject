@@ -1,0 +1,9 @@
+<!--Used to launch the NMEA service-->
+<launch>
+
+    <!--Used to read data from the GPS module-->
+    <node name="NMEA_Driver" pkg="nmea_navsat_driver" type="nmea_serial_driver" args="_port:=/dev/ttyUSB0 _baud:=38400"/>
+
+    <!--Service to easily retrieve the useful NMEA data-->
+    <node name="GPS_Service" pkg="rover_main" type="GPSService" output="screen"/>
+</launch>
