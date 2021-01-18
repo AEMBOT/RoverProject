@@ -6,15 +6,18 @@ import rospy
 
 from rover_client.srv import ControlService,ControlServiceResponse
 
-from control import ControllerUpdater
+from control.ControllerUpdater import ControllerUpdater
+
+CONTROLLER_UPDATER = ControllerUpdater()
 
 def on_service_contact(requested):
     """Called when the service is requested"""
 
-    return ControlServiceResponse(ControllerUpdater.getCurrentControllerState())
+    return ControlServiceResponse(CONTROLLER_UPDATER.get_current_controller_state())
 
 def start_service():
     """Start the service and node"""
+
 
     # Create a node to run the service from
     rospy.init_node("controller_service", anonymous=True)
@@ -25,7 +28,7 @@ def start_service():
                                        handler=on_service_contact)
 
     # Start the controller monitoring thread
-    ControllerUpdater.start_controller_monitor()
+    CONTROLLER_UPDATER.start_controller_monitor()
 
     # Announce that the setup is complete
     rospy.loginfo_once("Awaiting Controller Input...")
