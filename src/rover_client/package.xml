@@ -1,8 +1,10 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>rover_main</name>
-  <version>0.0.1</version>
-  <description>Package used to manage code based around the central rover control systems</description>
+  <name>rover_client</name>
+  <version>0.0.0</version>
+  <description>Package used to manage driver/driver station interaction with the rover</description>
+
+  <license>BSD</license>
 
   <!-- One maintainer tag required, multiple allowed, one person per tag -->
   <!-- Example:  -->
@@ -16,11 +18,11 @@
   <buildtool_depend>catkin</buildtool_depend>
   <build_depend>rospy</build_depend>
   <build_depend>std_msgs</build_depend>
-  <build_depend>message_generation</build_depend>
+  <build_depend>rover_main</build_depend>
   <build_export_depend>rospy</build_export_depend>
   <build_export_depend>std_msgs</build_export_depend>
   <exec_depend>rospy</exec_depend>
   <exec_depend>std_msgs</exec_depend>
-  <exec_depend>message_runtime</exec_depend>
-
+  <exec_depend>rover_main</exec_depend>
+  
 </package>
