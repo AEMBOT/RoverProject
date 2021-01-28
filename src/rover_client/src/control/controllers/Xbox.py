@@ -6,13 +6,6 @@ class Xbox:
         """
         self.controller = controller
 
-    def update_controller(self, controller):
-        """Updates the controller values at the start of the loop"""
-        self.controller = controller
-
-    def get_controller(self):
-        return self.controller
-
     # Button Inputs
 
     def get_button_A(self):
@@ -37,29 +30,17 @@ class Xbox:
     # Dpad inputs
 
     def get_dpad_up(self):
-        if self.controller.get_hat(0)[1] > 0.2:
-            return True
-        else:
-            return False
+        return self.controller.get_hat(0)[1] > 0.2
     
     def get_dpad_down(self):
-        if self.controller.get_hat(0)[1] < -0.2:
-            return True
-        else:
-            return False
+        return self.controller.get_hat(0)[1] < -0.2
 
     def get_dpad_right(self):
-        if self.controller.get_hat(0)[0] > 0.2:
-            return True
-        else:
-            return False
-
+        return self.controller.get_hat(0)[0] > 0.2
+    
     def get_dpad_left(self):
-        if self.controller.get_hat(0)[0] < -0.2:
-            return True
-        else:
-            return False
-
+        return self.controller.get_hat(0)[0] < -0.2
+    
     def get_joystick_left_x(self):
         return self.controller.get_axis(0)
 
@@ -73,10 +54,10 @@ class Xbox:
         return self.controller.get_axis(4)
 
     def get_right_trigger(self):
-        return self.__remap(self.controller.get_axis(5), (-1, 1), (0, 1))
+        return self.remap(self.controller.get_axis(5), (-1, 1), (0, 1))
     
     def get_left_trigger(self):
-        return self.__remap(self.controller.get_axis(2), (-1, 1), (0, 1))
+        return self.remap(self.controller.get_axis(2), (-1, 1), (0, 1))
     
     def remap(self, old_val, old_range: tuple, new_range: tuple):
         """Remaps a range of numbers to fit that of a new range"""
