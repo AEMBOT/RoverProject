@@ -62,7 +62,7 @@ def init_node():
     rospy.spin()
 
 def unit_range_to_controller(value):
-    """Convert from 0 - 1 to 0 - 127 with 64 in the middle to accommodate the motor controller values"""
+    """Convert from -1 to 1 to 0 to 127 with 64 in the middle to accommodate the motor controller values"""
     if value >= 0:
         if 64 + abs(round(value * 64)) > 127:
             return 127
