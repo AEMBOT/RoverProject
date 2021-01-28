@@ -1,4 +1,4 @@
-//See BareMinimum example for a list of library functions
+//Arduino Program that handles all external interfaces over I2C
 
 //Includes required to use Roboclaw library
 #include <SoftwareSerial.h>
@@ -89,7 +89,6 @@ void receiveData(int bytecount)
       wheel_angles[i] = angle_to_servo(int(Wire.read()));
     }
   }
-  
 }
 /**
  * Array to Controller/Motor Mappings
@@ -109,39 +108,38 @@ void receiveData(int bytecount)
 
 void loop() {
     
-    // Using sizeof the array divided by the sizeof an element in the array to get the length of the array of motors
-    for(int i=0; i<(sizeof(motor_speeds) / sizeof(motor_speeds[0])); i++){
-       if (motor_speeds[i] != last_motor_speeds[i]){
+  // Using sizeof the array divided by the sizeof an element in the array to get the length of the array of motors
+  for(int i=0; i<(sizeof(motor_speeds) / sizeof(motor_speeds[0])); i++){
+      if (motor_speeds[i] != last_motor_speeds[i]){
 
-          // Drive the first motor on the first controller
-          if (i == 0){
-            roboclaw.ForwardBackwardM1(controller_1_addr,motor_speeds[i]);
-          }
+        // Drive the first motor on the first controller
+        if (i == 0){
+          roboclaw.ForwardBackwardM1(controller_1_addr,motor_speeds[i]);
+        }
+        
+        // Drive the second motor on the first controller
+        else if (i == 1){
+          roboclaw.ForwardBackwardM2(controller_1_addr,motor_speeds[i]); 
+        }
           
-          // Drive the second motor on the first controller
-          else if (i == 1){
-            roboclaw.ForwardBackwardM2(controller_1_addr,motor_speeds[i]); 
-          }
-           
-  
-          // Set the last to the current
-          last_motor_speeds[i] = motor_speeds[i];
-       }
-    }
-
-    // Get all values in the wheel_angles array
-    for (int i=0; i<(sizeof(wheel_angles) / sizeof(wheel_angles[0])); i++){
-
-      // Check if the new angle is the same as last to avoid sending useless information
-      if (wheel_angles[i] != last_wheel_angles[i]){
-        // Write the angle to the corresponding servo 
-        servo_array[i].write(wheel_angles[i])
 
         // Set the last to the current
-        last_wheel_angles[i] = wheel_angles[i];
+        last_motor_speeds[i] = motor_speeds[i];
       }
+  }
+
+  // Get all values in the wheel_angles array
+  for (int i=0; i<(sizeof(wheel_angles) / sizeof(wheel_angles[0])); i++){
+
+    // Check if the new angle is the same as last to avoid sending useless information
+    if (wheel_angles[i] != last_wheel_angles[i]){
+      // Write the angle to the corresponding servo 
+      servo_array[i].write(wheel_angles[i])
+
+      // Set the last to the current
+      last_wheel_angles[i] = wheel_angles[i];
     }
-    
+  }
 }
 
 // Converts normal angles into matching angles of the geared down 
