@@ -2,7 +2,6 @@
 
 //Includes required to use Roboclaw library
 #include <SoftwareSerial.h>
-#include <Servo.h>
 #include <Wire.h>
 
 #include "RoboClaw.h"
@@ -28,18 +27,25 @@ int motor_speeds[] = {64, 64, 64, 64, 64, 64};
 // Values from the last loop to not send tons of information to the controller, only when new info is needed
 int last_motor_speeds[] = {64, 64, 64, 64, 64, 64};
 
-// Array to hold the angles of each of the servos
-int wheel_angles[] = {0, 0, 0, 0};
+// Array to hold the s
+int wheel_angle[] = {0, 0, 0, 0};
 
 // Array to hold the previous angles of each of the servos
 int last_wheel_angles[] = {0, 0, 0, 0};
+
 
 //Set the serial to run on the standard TX and RX pins
 SoftwareSerial serial(0,1);	
 RoboClaw roboclaw(&serial,10000);
 
-// Address of the first motor controller
-#define controller_1_addr 0x80
+// Address of the first driving motor controller
+#define drive_controller_addr_1 0x80
+#define drive_controller_addr_2 0x81
+#define drive_controller_addr_3 0x82
+
+// Address of the first steering motor controller.
+#define steering_controller_addr_1 0x83
+#define steering_controller_addr_2 0x84
 
 void setup() {
 
@@ -48,27 +54,11 @@ void setup() {
 
   //Open roboclaw serial ports
   roboclaw.begin(115200);
-
-  // Run the front left side servo on pin 9
-  front_left_servo.attach(9);
-
-  // Run the front right side servo on pin 10
-  front_right_servo.attach(10)
-
-  // Run the back left side servo on pin 5
-  back_left_servo.attach(5);
-
-  // Run the back right side servo on pin 6
-  back_right_servo.attach(6);
-
-  // Add all servos to spots in the servo array
-  servo_array[0] = front_left_servo;
-  servo_array[1] = front_right_servo;
-  servo_array[2] = back_left_servo;
-  servo_array[3] = back_right_servo;
-
 }
 
+/**
+ * When data is received by the slave arduino
+ */ 
 void receiveData(int bytecount)
 {
 
@@ -86,7 +76,7 @@ void receiveData(int bytecount)
   // Get information intended for the servos and store them in the servo array
   else if (register_id == 1){
     for (int i = 0; i < bytecount; i++){
-      wheel_angles[i] = angle_to_servo(int(Wire.read()));
+      wheel_angle[i] = gearedToEncoder(int(Wire.read()));
     }
   }
 }
@@ -99,11 +89,11 @@ void receiveData(int bytecount)
    * 3 - Controller 2 : Motor 2
    * 4 - Controller 3 : Motor 1
    * 5 - Controller 3 : Motor 2
- * 1 - Servo Turning Control
-   * 0 - Front Left Servo
-   * 1 - Front Right Servo
-   * 2 - Back Left Servo
-   * 3 - Back Right Servo
+ * 1 - Steering Control
+   * 0 - Front Left 
+   * 1 - Front Right 
+   * 2 - Back Left 
+   * 3 - Back Right 
  */
 
 void loop() {
@@ -111,17 +101,27 @@ void loop() {
   // Using sizeof the array divided by the sizeof an element in the array to get the length of the array of motors
   for(int i=0; i<(sizeof(motor_speeds) / sizeof(motor_speeds[0])); i++){
       if (motor_speeds[i] != last_motor_speeds[i]){
-
-        // Drive the first motor on the first controller
-        if (i == 0){
-          roboclaw.ForwardBackwardM1(controller_1_addr,motor_speeds[i]);
+        switch (i)
+        {
+          case 0:
+            roboclaw.ForwardBackwardM1(drive_controller_addr_1,motor_speeds[i]);
+            break;
+          case 1:
+            roboclaw.ForwardBackwardM2(drive_controller_addr_1,motor_speeds[i]); 
+            break;
+          case 2:
+            roboclaw.ForwardBackwardM1(drive_controller_addr_2,motor_speeds[i]);
+            break;
+          case 3:
+            roboclaw.ForwardBackwardM2(drive_controller_addr_2,motor_speeds[i]);
+            break;
+          case 4:
+            roboclaw.ForwardBackwardM1(drive_controller_addr_3,motor_speeds[i]);
+            break;
+          case 5:
+            roboclaw.ForwardBackwardM2(drive_controller_addr_3,motor_speeds[i]); 
+            break;
         }
-        
-        // Drive the second motor on the first controller
-        else if (i == 1){
-          roboclaw.ForwardBackwardM2(controller_1_addr,motor_speeds[i]); 
-        }
-          
 
         // Set the last to the current
         last_motor_speeds[i] = motor_speeds[i];
@@ -133,8 +133,21 @@ void loop() {
 
     // Check if the new angle is the same as last to avoid sending useless information
     if (wheel_angles[i] != last_wheel_angles[i]){
-      // Write the angle to the corresponding servo 
-      servo_array[i].write(wheel_angles[i])
+      switch (i)
+        {
+          case 0:
+            roboclaw.ForwardBackwardM1(steering_controller_addr_1, getWheelPowers(wheel_angle[i]));
+            break;
+          case 1:
+            roboclaw.ForwardBackwardM2(steering_controller_addr_1, getWheelPowers(wheel_angle[i])); 
+            break;
+          case 2:
+            roboclaw.ForwardBackwardM1(steering_controller_addr_2, getWheelPowers(wheel_angle[i]));
+            break;
+          case 3:
+            roboclaw.ForwardBackwardM2(steering_controller_addr_2, getWheelPowers(wheel_angle[i]));
+            break;
+        }
 
       // Set the last to the current
       last_wheel_angles[i] = wheel_angles[i];
@@ -142,9 +155,9 @@ void loop() {
   }
 }
 
-// Converts normal angles into matching angles of the geared down 
-int angle_to_servo(int input){
+// Convert the angle we want the wheels to be facing into a motor power that PID is applied to, to reach the goal
+int getWheelPowers(int currentAngle){
 
-  // Implement at a later date
-  return input
+  // TODO: PID It up
+  return input; 
 }

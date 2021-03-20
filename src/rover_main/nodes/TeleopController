@@ -43,6 +43,7 @@ def control_thread():
 
     # Arrays to hold individual motor values
     motor_speeds = [0, 0, 0, 0, 0, 0]
+    wheel_angles = [0, 0, 0, 0]
 
     # Block until the I2C service is ready and then connect so that data can be sent and received
     rospy.wait_for_service("drive_train_controller")
@@ -55,25 +56,34 @@ def control_thread():
     # Simple test to run both motors 
     while not rospy.is_shutdown():
 
-        # For this test get the left and right Y joystick values
+        # Left Y is the forward/backward movement
         left_y = float(CONTROLLER_STATE.Joystick_LeftY)
-        right_y = float(CONTROLLER_STATE.Joystick_RightY)
 
-        # Set the values in the motor_speed array to the controller inputs
-        motor_speeds[0] = left_y
-        motor_speeds[1] = right_y
+        # Right X is the steering control
+        right_x = float(CONTROLLER_STATE.Joystick_RightX)
 
         # Create a slight deadzone so that you can easily stop the motors (A standard foreach loop wasn't working here)
         for i in range(len(motor_speeds)):
+            motor_speeds[i] = left_y
             if(motor_speeds[i] <  0 + CONTROLLER_DEADZONE and motor_speeds[i] > 0 - CONTROLLER_DEADZONE):
                 motor_speeds[i] = 0
 
+        # Wheel 
+        for i in rage(len(wheel_angles)):
+            wheel_angles = joystick_to_angle(right_x)
+            if(right_x <  0 + CONTROLLER_DEADZONE and right_x > 0 - CONTROLLER_DEADZONE):
+                wheel_angles[i] = 0
         try:
-            rospy.loginfo(drive_train_controller(motor_speeds=motor_speeds))
+            rospy.loginfo(drive_train_controller(motor_speeds=motor_speeds, wheel_angles=wheel_angles))
         except rospy.ServiceException as e:
             rospy.logfatal_once(f"Service Exception Occurred: {e}")
         
+def joystick_to_angle(xInput):
+    """Converts joystick values into angles by simply using the upper bounds as the maximum angle and then everything else below is calculated from that"""
 
+    # Maximum turning angle in degrees
+    maximumSteerAngle = 30
+    return xInput * maximumSteerAngle
 
 if __name__ == "__main__":
     # Thread to handle actions taken based on controller input
