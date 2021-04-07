@@ -44,7 +44,7 @@ def on_service_contact(data):
             I2C_SERVICE(i2c_data=bytes(wheel_angles), register_id=I2CRegisterID.SteeringMotors, device_address=CONTROL_ARDUINO_ADDRESS)
             return DriveTrainServiceResponse("Request Executed Successfully")
         except Exception as e:
-            return DriveTrainServiceResponse(f"I2C Exception Occurred: {e}"")
+            return DriveTrainServiceResponse(f"I2C Exception Occurred: {e}")
 
     # Copy the current motor speed variable to the last
     LAST_MOTOR_SPEEDS = motor_speeds.copy()
