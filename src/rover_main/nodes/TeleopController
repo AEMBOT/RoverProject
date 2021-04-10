@@ -62,29 +62,26 @@ def control_thread():
         # Right X is the steering control
         right_x = float(CONTROLLER_STATE.Joystick_RightX)
 
+        # TODO: FUTURE NOTICE! Change this to passing single Left Y and Right X values across and have the arduino handle interpolation of inputs, 
+        # Not yet implemented as that change could break things
+
         # Create a slight deadzone so that you can easily stop the motors (A standard foreach loop wasn't working here)
         for i in range(len(motor_speeds)):
             motor_speeds[i] = left_y
             if(motor_speeds[i] <  0 + CONTROLLER_DEADZONE and motor_speeds[i] > 0 - CONTROLLER_DEADZONE):
                 motor_speeds[i] = 0
 
-        # Wheel 
+        # Pass joystick mappings into the wheel_angles list
         for i in rage(len(wheel_angles)):
             wheel_angles[i] = right_x
             if(right_x <  0 + CONTROLLER_DEADZONE and right_x > 0 - CONTROLLER_DEADZONE):
                 wheel_angles[i] = 0
+
+        # Attempt to contact the service with the data
         try:
             rospy.loginfo(drive_train_controller(motor_speeds=motor_speeds, wheel_angles=wheel_angles))
         except rospy.ServiceException as e:
             rospy.logfatal_once(f"Service Exception Occurred: {e}")
-        
-def joystick_to_angle(xInput):
-    """Converts joystick values into angles by simply using the upper bounds as the maximum angle and then everything else below is calculated from that"""
-
-
-    # Maximum turning angle in degrees
-    maximumSteerAngle = 30
-    return xInput * maximumSteerAngle
 
 if __name__ == "__main__":
     # Thread to handle actions taken based on controller input

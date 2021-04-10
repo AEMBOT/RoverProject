@@ -23,7 +23,7 @@ def on_service_contact(data):
     I2Cbus.write_i2c_block_data(device_address, register_id, bytes(list(i2c_data)))
 
     # Log the info being sent
-    rospy.loginfo(f"Sending {i2c_data} to device {device_address} with the register id of {register_id}")
+    rospy.loginfo(f"{rospy.get_name()}: Sending {i2c_data} to device {device_address} with the register id of {register_id}")
 
     # Return 0 if register is 0 as we are commanding motors
     if register_id == 0:

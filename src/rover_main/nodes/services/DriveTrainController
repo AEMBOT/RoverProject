@@ -51,15 +51,15 @@ def init_node():
     # Create the service itself
     service = rospy.Service("drive_train_controller", DriveTrainService, handler=on_service_contact)
 
+    # Add some log information for the boot proccess
     rospy.loginfo(f"{rospy.get_name()}: waiting for the I2C_service")
+
     # Wait for the I2C Service to be up
     rospy.wait_for_service("I2C_Service")
     
-
     # Create a persistent connection to the I2C Service
     global I2C_SERVICE
     I2C_SERVICE = rospy.ServiceProxy("I2C_Service", service_class=I2C_Service, persistent=True)
-    rospy.loginfo(f"{rospy.get_name()}: connected to I2C_Service")
 
     # Used to distinguish output from a launch file
     rospy.loginfo(f"{rospy.get_name()}: awaiting instruction...")
