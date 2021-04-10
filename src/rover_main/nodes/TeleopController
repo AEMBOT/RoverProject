@@ -25,7 +25,7 @@ def create_node():
     """Starts the node and subscribes the required data topics"""
 
     # Create a new network communication node
-    rospy.init_node("teleop_controller", anonymous=True)
+    rospy.init_node("TeleopControllerNode")
 
     # Subscribe to the controller topic to get information from
     rospy.Subscriber(name="controller_state",
@@ -70,7 +70,7 @@ def control_thread():
 
         # Wheel 
         for i in rage(len(wheel_angles)):
-            wheel_angles = joystick_to_angle(right_x)
+            wheel_angles[i] = right_x
             if(right_x <  0 + CONTROLLER_DEADZONE and right_x > 0 - CONTROLLER_DEADZONE):
                 wheel_angles[i] = 0
         try:
@@ -80,6 +80,7 @@ def control_thread():
         
 def joystick_to_angle(xInput):
     """Converts joystick values into angles by simply using the upper bounds as the maximum angle and then everything else below is calculated from that"""
+
 
     # Maximum turning angle in degrees
     maximumSteerAngle = 30

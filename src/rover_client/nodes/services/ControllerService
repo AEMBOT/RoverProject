@@ -20,7 +20,7 @@ def start_service():
 
 
     # Create a node to run the service from
-    rospy.init_node("controller_service", anonymous=True)
+    rospy.init_node("ControllerServiceNode")
 
     # Create the actual service
     controller_service = rospy.Service(name="controller_service",

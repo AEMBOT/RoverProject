@@ -8,7 +8,7 @@ from rover_client.srv import ControlService
 
 def create_node():
     # Start the new node to being receiving information
-    rospy.init_node("controller_node", anonymous=True)
+    rospy.init_node("ControllerPublisherNode")
 
     # Connect to the controller service to receive information about the controller state
     rospy.wait_for_service("controller_service")

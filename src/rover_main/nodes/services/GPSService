@@ -23,7 +23,7 @@ def subscriber_callback(callback):
 
 def init_node():
     # Start the GPS Service
-    rospy.init_node("GPSService", anonymous=True)
+    rospy.init_node("GPSServiceNode")
 
     # Subscribe to the location fix topic
     rospy.Subscriber(name="fix"
