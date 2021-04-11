@@ -1,10 +1,10 @@
 # Handles all data that is sent to the drive train to control it
 
 # Motor inputs on the range of -1 to 1
-float64[] motor_speeds
+float64 motor_speeds
 
 # Angle inputs for the servos in terms of degrees
-float64[] wheel_angles
+float64 wheel_angles
 
 ---
 

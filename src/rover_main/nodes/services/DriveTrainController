@@ -17,20 +17,33 @@ CONTROL_ARDUINO_ADDRESS = 0x08
 # Global instance of the I2C Service object
 I2C_SERVICE = None
 
+true_motor_inputs = [64, 64, 64, 64, 64, 64, 64, 64, 64, 64]
+
 # Store the values from the last motor speed request
 LAST_MOTOR_INPUTS = []
 
 def on_service_contact(data):
     global LAST_MOTOR_INPUTS, LAST_WHEEL_ANGLES
+
+    # List of the forward vector and turn vectors
     motor_inputs = list(data.motor_inputs)
     wheel_angles = list(data.wheel_angles)
 
-    # Add the wheel angles on to the motor inputs as to only send one packet with all the required data
+    # Combine vectors into one list
     motor_inputs.extend(wheel_angles)
 
     # Loop through the motor speeds and prepare the data to be sent to the arduino
     for i, value in enumerate(motor_inputs):
-        motor_inputs[i] = unit_range_to_controller(value)
+
+        # Convert the 2 joystick values into a full array of motor inputs
+        if i == 0:
+            for c in range(6):
+                true_motor_inputs[c] = unit_range_to_controller(value)
+        else:
+            for c in range(4):
+                c+=6
+                true_motor_inputs[c] = unit_range_to_controller(value)
+
 
     # Check to see if the motor values have actually changed
     if motor_inputs != LAST_MOTOR_INPUTS:

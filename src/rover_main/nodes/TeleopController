@@ -15,6 +15,14 @@ CONTROLLER_STATE = None
 # Global controller deadzone
 CONTROLLER_DEADZONE = 0.05
 
+def normalize_controller_inputs(input, output_array):
+    """Create a slight deadzone so that you can easily stop the motors (A standard foreach loop wasn't working here)"""
+
+    if(input <  0 + CONTROLLER_DEADZONE and input > 0 - CONTROLLER_DEADZONE):
+        input = 0
+    
+    return input
+
 def control_topic_update(callback_data):
     global CONTROLLER_STATE
     
@@ -41,10 +49,6 @@ def control_thread():
     # Get the global version of controller state
     global CONTROLLER_STATE
 
-    # Arrays to hold individual motor values
-    motor_speeds = [0, 0, 0, 0, 0, 0]
-    wheel_angles = [0, 0, 0, 0]
-
     # Block until the I2C service is ready and then connect so that data can be sent and received
     rospy.wait_for_service("drive_train_controller")
     drive_train_controller = rospy.ServiceProxy("drive_train_controller", service_class=DriveTrainService, persistent=True)
@@ -62,24 +66,9 @@ def control_thread():
         # Right X is the steering control
         right_x = float(CONTROLLER_STATE.Joystick_RightX)
 
-        # TODO: FUTURE NOTICE! Change this to passing single Left Y and Right X values across and have the arduino handle interpolation of inputs, 
-        # Not yet implemented as that change could break things
-
-        # Create a slight deadzone so that you can easily stop the motors (A standard foreach loop wasn't working here)
-        for i in range(len(motor_speeds)):
-            motor_speeds[i] = left_y
-            if(motor_speeds[i] <  0 + CONTROLLER_DEADZONE and motor_speeds[i] > 0 - CONTROLLER_DEADZONE):
-                motor_speeds[i] = 0
-
-        # Pass joystick mappings into the wheel_angles list
-        for i in rage(len(wheel_angles)):
-            wheel_angles[i] = right_x
-            if(right_x <  0 + CONTROLLER_DEADZONE and right_x > 0 - CONTROLLER_DEADZONE):
-                wheel_angles[i] = 0
-
         # Attempt to contact the service with the data
         try:
-            rospy.loginfo(drive_train_controller(motor_speeds=motor_speeds, wheel_angles=wheel_angles))
+            rospy.loginfo(drive_train_controller(motor_speeds=normalize_controller_inputs(left_y), wheel_angles=normalize_controller_inputs(right_x)))
         except rospy.ServiceException as e:
             rospy.logfatal_once(f"Service Exception Occurred: {e}")
 
