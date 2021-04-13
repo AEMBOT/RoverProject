@@ -18,8 +18,8 @@ int motor_inputs[] = {64, 64, 64, 64, 64, 64, 64, 64, 64, 64};
 // Values from the last loop to not send tons of information to the controller, only when new info is needed
 int last_motor_inputs[] = {64, 64, 64, 64, 64, 64, 64, 64, 64, 64};
 
-//Set the serial to run on the standard TX and RX pins
-SoftwareSerial serial(0,1);	
+//Set the serial to run on PWM pins 10 and 11 with the hopes that we can regain basic USB serial interaction
+SoftwareSerial serial(10,11);	
 RoboClaw roboclaw(&serial,10000);
 
 // Address of the first driving motor controller
@@ -45,15 +45,30 @@ void setup() {
  */ 
 void receiveData(int bytecount)
 {
+  int receivedByte = 0;
 
-  // Check the first byte to see where the information we are receiving should be stored
-  register_id = int(Wire.read());
+  // Counter gets reset after a new reg-id arrives
+  int i = 0;
 
-  // I2C Packet ID to signify drive train information
-  if (register_id == 0){
-    // Set the new motor speeds
-    for (int i = 0; i < bytecount; i++) {
-      motor_inputs[i] = int(Wire.read());
+
+  // Use wire.availale to read out all recieved data
+  while (Wire.available()){
+
+    // Get and stor the byte so we can access it in multiple places
+    receivedByte = int(Wire.read());
+
+    // Check if the byte number was high enough to be a register byte
+    if (receivedByte == 222){
+      register_id = receivedByte;
+
+      // Reset the array counter
+      i = 0;
+    }
+
+    // After checking if our last byte was a reg-id check which reg ID it was and if it was the driving one act accordingly
+    if (register_id == 222){
+      motor_inputs[i] = receivedByte;
+      i++;
     }
   }
 }

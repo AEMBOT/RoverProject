@@ -8,8 +8,7 @@ from rover_main.srv import I2C_Service
 
 class I2CRegisterID(enum.Enum):
     """Maps variable names to the corresponding register ids"""
-    DriveTrain = 0
-    SteeringMotors = 1
+    DriveTrain = 222
 
 # Address that the arduino is located at on the I2C bus
 CONTROL_ARDUINO_ADDRESS = 0x08
@@ -26,7 +25,7 @@ def on_service_contact(data):
     global LAST_MOTOR_INPUTS, LAST_WHEEL_ANGLES
 
     # List of the forward vector and turn vectors
-    motor_inputs = list(data.motor_inputs)
+    motor_inputs = list(data.motor_speeds)
     wheel_angles = list(data.wheel_angles)
 
     # Combine vectors into one list
@@ -48,7 +47,7 @@ def on_service_contact(data):
     # Check to see if the motor values have actually changed
     if motor_inputs != LAST_MOTOR_INPUTS:
         try:
-            I2C_SERVICE(i2c_data=bytes(motor_inputs), register_id=I2CRegisterID.DriveTrain, device_address=CONTROL_ARDUINO_ADDRESS)
+            I2C_SERVICE(i2c_data=motor_inputs, register_id=I2CRegisterID.DriveTrain.value, device_address=CONTROL_ARDUINO_ADDRESS)
             return DriveTrainServiceResponse("Request Executed Successfully")
         except Exception as e:
             return DriveTrainServiceResponse(f"I2C Exception Occurred: {e}")
