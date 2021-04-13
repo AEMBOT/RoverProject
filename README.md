@@ -12,7 +12,9 @@ Follow the install instructions for Ubuntu.
 After the install you need to add a few lines to your .bashrc file (This allows certain commands to run when a new terminal is opened)
 1. After running a catkin_make to build the project, you will need to add the `setup.bash` file for the RoverProject to the `.bashrc`.
 To do this you simply need to open the .bashrc file and add the line:<br>
-```source <RoverProject Parent Directory>/RoverProject/devel/setup.bash```
+```
+source <RoverProject Parent Directory>/RoverProject/devel/setup.bash
+```
 
 2. Next you need to add the `src` folder from within each of the rover packages to the PYTHONPATH.
 To do this you need to add the following line **ABOVE** the setup.bash calls:<br>
