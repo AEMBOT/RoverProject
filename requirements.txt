@@ -1,3 +1,6 @@
+# Joystick Input Control Is Handled via pygame
+pygame
+
 # I2C Controller
 smbus2
 

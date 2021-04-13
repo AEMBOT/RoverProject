@@ -6,15 +6,16 @@
         "PYTHONPATH": "${workspaceFolder}/src/rover_main/src",
     },
     "terminal.integrated.env.windows": {
-        "PYTHONPATH": "${workspaceFolder}/src/rover_main/src",
+        "PYTHONPATH": "${workspaceFolder}/src/rover_main/src:${workspaceFolder}/src/rover_client/src",
     },
     "python.envFile": "${workspaceFolder}/.env",
-    "C_Cpp.errorSquiggles": "Disabled",
+  
+    "ros.distro": "noetic",
     "python.autoComplete.extraPaths": [
-        "C:/opt/workspaces/RoverProject/devel\\lib/site-packages",
-        "c:\\opt\\ros\\noetic\\x64\\lib/site-packages",
-        "c:\\opt\\ros\\noetic\\x64\\Lib\\site-packages",
-        "C:\\opt\\workspaces\\RoverProject\\src\\rover_client\\src",
-        "C:\\opt\\workspaces\\RoverProject\\src\\rover_main\\src"
+        "${workspaceFolder}devel/lib/python3/dist-packages",
+        "/opt/ros/noetic/lib/python3/dist-packages"
     ],
+    "cSpell.words": [
+        "comms"
+  ],
 }

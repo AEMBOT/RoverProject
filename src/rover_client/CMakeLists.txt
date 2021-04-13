@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0.2)
-project(rover_main)
+project(rover_client)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
 # add_compile_options(-std=c++11)
@@ -8,8 +8,8 @@ project(rover_main)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
-  roscpp
   rospy
+  roscpp
   std_msgs
   message_generation
 )
@@ -48,18 +48,17 @@ find_package(catkin REQUIRED COMPONENTS
 ##   * add every package in MSG_DEP_SET to generate_messages(DEPENDENCIES ...)
 
 ## Generate messages in the 'msg' folder
-add_message_files(
-   FILES
-   controllerMap.msg
- )
+# add_message_files(
+#   FILES
+#   Message1.msg
+#   Message2.msg
+# )
 
 ## Generate services in the 'srv' folder
 add_service_files(
    FILES
-
-   # Handles I2C driver communication
-   i2c_comms.srv
- )
+   ControlService.srv
+)
 
 ## Generate actions in the 'action' folder
 # add_action_files(
@@ -72,6 +71,7 @@ add_service_files(
 generate_messages(
    DEPENDENCIES
    std_msgs
+   rover_main
  )
 
 ################################################
@@ -105,7 +105,7 @@ generate_messages(
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
 #  INCLUDE_DIRS include
-#  LIBRARIES drive_train
+#  LIBRARIES rover_client
 #  CATKIN_DEPENDS rospy std_msgs
 #  DEPENDS system_lib
 )
@@ -123,7 +123,7 @@ include_directories(
 
 ## Declare a C++ library
 # add_library(${PROJECT_NAME}
-#   src/${PROJECT_NAME}/drive_train.cpp
+#   src/${PROJECT_NAME}/rover_client.cpp
 # )
 
 ## Add cmake target dependencies of the library
@@ -134,7 +134,7 @@ include_directories(
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-# add_executable(${PROJECT_NAME}_node src/drive_train_node.cpp)
+# add_executable(${PROJECT_NAME}_node src/rover_client_node.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -161,8 +161,9 @@ include_directories(
 ## Mark executable scripts (Python etc.) for installation
 ## in contrast to setup.py, you can choose the destination
 catkin_install_python(PROGRAMS
-  nodes/services/I2C_Service
-  scripts/communication/I2C_Service_Test
+  # Controller Inputs
+  nodes/services/ControllerService
+  nodes/ControllerPublisher
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
@@ -199,7 +200,7 @@ catkin_install_python(PROGRAMS
 #############
 
 ## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_drive_train.cpp)
+# catkin_add_gtest(${PROJECT_NAME}-test test/test_rover_client.cpp)
 # if(TARGET ${PROJECT_NAME}-test)
 #   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
 # endif()
