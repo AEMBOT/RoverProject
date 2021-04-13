@@ -15,7 +15,7 @@ CONTROLLER_STATE = None
 # Global controller deadzone
 CONTROLLER_DEADZONE = 0.05
 
-def normalize_controller_inputs(input, output_array):
+def create_controller_deadzone(input):
     """Create a slight deadzone so that you can easily stop the motors (A standard foreach loop wasn't working here)"""
 
     if(input <  0 + CONTROLLER_DEADZONE and input > 0 - CONTROLLER_DEADZONE):
@@ -68,7 +68,7 @@ def control_thread():
 
         # Attempt to contact the service with the data
         try:
-            rospy.loginfo(drive_train_controller(motor_speeds=normalize_controller_inputs(left_y), wheel_angles=normalize_controller_inputs(right_x)))
+            rospy.loginfo(drive_train_controller(motor_speeds=create_controller_deadzone(left_y), wheel_angles=create_controller_deadzone(right_x)))
         except rospy.ServiceException as e:
             rospy.logfatal_once(f"Service Exception Occurred: {e}")
 
