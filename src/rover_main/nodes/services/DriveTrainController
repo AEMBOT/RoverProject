@@ -3,6 +3,8 @@
 import rospy
 import enum
 
+from roboclaw import Roboclaw
+
 from rover_main.srv import DriveTrainService, DriveTrainServiceResponse
 from rover_main.srv import I2C_Service
 
@@ -13,20 +15,31 @@ class I2CRegisterID(enum.Enum):
 # Address that the arduino is located at on the I2C bus
 CONTROL_ARDUINO_ADDRESS = 0x08
 
+roboclaw_1 = Roboclaw("/dev/ttyACM0", 38400)
+roboclaw_2 = Roboclaw("/dev/ttyACM1", 38400)
+roboclaw_3 = Roboclaw("/dev/ttyACM2", 38400)
+
 # Global instance of the I2C Service object
 I2C_SERVICE = None
 
 true_motor_inputs = [64, 64, 64, 64, 64, 64, 64, 64, 64, 64]
 
+drive_controller_1 = 0x80
+drive_controller_2 = 0x81
+drive_controller_3 = 0x82
+
+steering_controller_4 = 0x83
+steering_controller_5 = 0x84
+
 # Store the values from the last motor speed request
 LAST_MOTOR_INPUTS = []
 
 def on_service_contact(data):
-    global LAST_MOTOR_INPUTS, LAST_WHEEL_ANGLES
+    global LAST_MOTOR_INPUTS, roboclaw_1, roboclaw_2, roboclaw_3
 
     # List of the forward vector and turn vectors
-    motor_inputs = list(data.motor_speeds)
-    wheel_angles = list(data.wheel_angles)
+    motor_inputs = [data.motor_speeds]
+    wheel_angles = [data.wheel_angles]
 
     # Combine vectors into one list
     motor_inputs.extend(wheel_angles)
@@ -43,19 +56,32 @@ def on_service_contact(data):
                 c+=6
                 true_motor_inputs[c] = unit_range_to_controller(value)
 
-
     # Check to see if the motor values have actually changed
-    if motor_inputs != LAST_MOTOR_INPUTS:
-        try:
-            I2C_SERVICE(i2c_data=motor_inputs, register_id=I2CRegisterID.DriveTrain.value, device_address=CONTROL_ARDUINO_ADDRESS)
-            return DriveTrainServiceResponse("Request Executed Successfully")
-        except Exception as e:
-            return DriveTrainServiceResponse(f"I2C Exception Occurred: {e}")
+    if true_motor_inputs != LAST_MOTOR_INPUTS:
+        
+        # Roboclaw 1
+        roboclaw_1.ForwardBackwardM1(drive_controller_1, true_motor_inputs[0])
+        roboclaw_1.ForwardBackwardM2(drive_controller_1, true_motor_inputs[1])
+
+        # Roboclaw 2
+        roboclaw_2.ForwardBackwardM1(drive_controller_2, true_motor_inputs[2])
+        roboclaw_2.ForwardBackwardM2(drive_controller_2, true_motor_inputs[3])
+
+        # Roboclaw 3
+        roboclaw_3.ForwardBackwardM1(drive_controller_2, true_motor_inputs[4])
+        roboclaw_3.ForwardBackwardM2(drive_controller_2, true_motor_inputs[5])
+
+        return DriveTrainServiceResponse("Request Executed Successfully")
 
     # Copy the current motor speed variable to the last
-    LAST_MOTOR_INPUTS = motor_inputs.copy()
+    LAST_MOTOR_INPUTS = true_motor_inputs.copy()
 
 def init_node():
+    global roboclaw_1, roboclaw_2, roboclaw_3
+
+    roboclaw_1.Open()
+    roboclaw_2.Open()
+    roboclaw_3.Open()
 
     # Create new node to act as the controller_Service
     rospy.init_node("DriveTrainControllerNode")
