@@ -8,18 +8,8 @@ from roboclaw import Roboclaw
 from rover_main.srv import DriveTrainService, DriveTrainServiceResponse
 from rover_main.srv import I2C_Service
 
-class I2CRegisterID(enum.Enum):
-    """Maps variable names to the corresponding register ids"""
-    DriveTrain = 222
-
-# Address that the arduino is located at on the I2C bus
-CONTROL_ARDUINO_ADDRESS = 0x08
-
 # Roboclaw device set to talk over serial, ttyS0 corresponds to GPIO 14 & 15 or standard TX and RX on the Rpi
 roboclaw = Roboclaw("/dev/ttyS0", 115200)
-
-# Global instance of the I2C Service object
-I2C_SERVICE = None
 
 true_motor_inputs = [64, 64, 64, 64, 64, 64, 64, 64, 64, 64]
 
@@ -92,16 +82,6 @@ def init_node():
 
     # Create the service itself
     service = rospy.Service("drive_train_controller", DriveTrainService, handler=on_service_contact)
-
-    # Add some log information for the boot proccess
-    rospy.loginfo(f"{rospy.get_name()}: waiting for the I2C_service")
-
-    # Wait for the I2C Service to be up
-    rospy.wait_for_service("I2C_Service")
-    
-    # Create a persistent connection to the I2C Service
-    global I2C_SERVICE
-    I2C_SERVICE = rospy.ServiceProxy("I2C_Service", service_class=I2C_Service, persistent=True)
 
     # Used to distinguish output from a launch file
     rospy.loginfo(f"{rospy.get_name()}: awaiting instruction...")
