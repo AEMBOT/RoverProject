@@ -56,9 +56,7 @@ add_message_files(
 ## Generate services in the 'srv' folder
 add_service_files(
    FILES
-   I2C_Service.srv
    DriveTrainService.srv
-   GPS_Service.srv
  )
 
 ## Generate actions in the 'action' folder
@@ -168,12 +166,6 @@ catkin_install_python(PROGRAMS
 
   # Drive Train Nodes
   nodes/TeleopController
-
-  # I2C services
-  nodes/services/I2CService
-
-  # GPS Services
-  nodes/services/GPSService
 )
 
 ## Mark executables for installation

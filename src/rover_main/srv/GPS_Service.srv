@@ -1,5 +1,0 @@
-# Returns the lat, long and altitude data from a NMEA GPS
----
-
-# Array that contains lat, long and altidude respectivly
-float64[] positional_data
