@@ -7,6 +7,8 @@ import rospy
 from rover_main.msg import controllerMap
 from rover_main.srv import DriveTrainService
 
+
+from math import pow
 from time import sleep
 import threading
 
@@ -66,11 +68,19 @@ def control_thread():
         # Right X is the steering control
         right_x = float(CONTROLLER_STATE.Joystick_RightX)
 
+        # Scale the input values to allow for minor adjustments to be made as to not break anything
+        left_y = convert_to_cubic(left_y)
+        right_x = convert_to_cubic(right_x)
+
         # Attempt to contact the service with the data
         try:
             rospy.loginfo(drive_train_controller(motor_speeds=create_controller_deadzone(left_y), wheel_angles=create_controller_deadzone(right_x)))
         except rospy.ServiceException as e:
             rospy.logfatal_once(f"Service Exception Occurred: {e}")
+
+def convert_to_cubic(value):
+    """Converts the joystick inputs to a cubic function to scale the values to start slow while still ending at 1"""
+    return pow(value, 3)
 
 if __name__ == "__main__":
     # Thread to handle actions taken based on controller input

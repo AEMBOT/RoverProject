@@ -64,9 +64,8 @@ void receiveData(int bytecount)
       // Reset the array counter
       i = 0;
     }
-
     // After checking if our last byte was a reg-id check which reg ID it was and if it was the driving one act accordingly
-    if (register_id == 222){
+    else if (register_id == 222){
       motor_inputs[i] = receivedByte;
       i++;
     }

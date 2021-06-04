@@ -26,6 +26,7 @@ drive_controller_1 = 0x80
 drive_controller_2 = 0x81
 drive_controller_3 = 0x82
 
+# Addresses for the steering controllers
 steering_controller_4 = 0x83
 steering_controller_5 = 0x84
 
