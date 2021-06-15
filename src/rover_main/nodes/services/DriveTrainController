@@ -5,6 +5,7 @@ import rospy
 from enum import Enum
 
 from roboclaw import Roboclaw
+import controller_math
 
 from rover_main.srv import DriveTrainService, DriveTrainServiceResponse
 
@@ -100,6 +101,9 @@ def unit_range_to_controller(value):
 
 def calculate_wheel_angle(value, wheelLocation):
     selected_wheel = wheelLocation.value
+
+    # Print out the angle for the given wheel
+    print(f"{wheelLocation.name} : {controller_math.getWheelAngle(selected_wheel)}")
     return input
 
 if __name__ == "__main__":
