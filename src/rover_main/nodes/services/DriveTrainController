@@ -9,8 +9,12 @@ import controller_math
 
 from rover_main.srv import DriveTrainService, DriveTrainServiceResponse
 
+
+from simple_pid import PID
+
 # Setup a roboclaw object to connect to devices on the standard TX/RX serial bus on the Pi with a baudrate of 115200
 roboclaw = Roboclaw("/dev/ttyS0", 115200)
+wheelAnglePID = PID(Kp=1, Ki=0, Kd=0, setpoint=0, sample_time=None, proportional_on_measurement=True)
 
 """
 Hex to ID mappings for controllers
@@ -35,12 +39,71 @@ steering_controller_5 = 0x84
 LAST_DRIVE_SPEED = 0.0
 LAST_ANGLE_INPUT = 0.0
 
-def on_service_contact(data):
-    global LAST_DRIVE_SPEED, LAST_ANGLE_INPUT, roboclaw
+drive_speed = 0
+wheel_angle_input = 0
 
-    # List of the forward vector and turn vectors
+def on_service_contact(data):
+    global LAST_DRIVE_SPEED, LAST_ANGLE_INPUT, drive_speed, wheel_angle_input, roboclaw
+
+    # Set the values received by the service call
     drive_speed = data.motor_speeds
     wheel_angle_input = data.wheel_angles
+
+    return DriveTrainServiceResponse("Request Executed Successfully")
+
+def init_node():
+    global roboclaw
+
+    roboclaw.Open()
+
+    # Create new node to act as the controller_Service
+    rospy.init_node("DriveTrainControllerNode")
+
+    # Create the service itself
+    service = rospy.Service("drive_train_controller", DriveTrainService, handler=on_service_contact)
+
+    # Used to distinguish output from a launch file
+    rospy.loginfo(f"{rospy.get_name()}: awaiting instruction...")
+
+    # Always running updating the information 300 times per second
+    while not rospy.is_shutdown():
+        update_motor_controllers()
+        rospy.Rate(100).sleep()
+
+
+    
+def calculate_wheel_power(value, wheelLocation):
+    """Take a given controller input and wheel location and return the PID scaled value to achieve that angle"""
+    selected_wheel = wheelLocation.value
+
+    # Remap the controller inputs to the turnRadius inputs, and update the 
+    turnRadius = controller_math.remapBounds(0, 1, 1, 10.4645, 1-abs(value))
+    controller_math.updateCircleRadius(turnRadius)
+
+    # Set the setpoint equal to the desired angle
+    wheelAnglePID.setpoint = controller_math.getWheelAngle(selected_wheel)
+
+    # Convert the -1 to 1 scalar to the motor controllers 0 to 127
+    return controller_math.map_to_motor_controller(wheelAnglePID(get_current_wheel_angle(selected_wheel)))
+
+def get_current_wheel_angle(wheel):
+    """"Return the current angle of the given wheel"""
+    if wheel == 0:
+        return roboclaw.ReadEncM1(drive_controller_1)
+    elif wheel == 1:
+        return roboclaw.ReadEncM2(drive_controller_1)
+    if wheel == 2:
+        return roboclaw.ReadEncM1(drive_controller_3)
+    elif wheel == 3:
+        return roboclaw.ReadEncM2(drive_controller_3)
+
+
+if __name__ == "__main__":
+    init_node()
+
+def update_motor_controllers():
+    """Update the motor controller values in the main loop instead of on contact cause that could lead to problems"""
+    global LAST_DRIVE_SPEED, LAST_ANGLE_INPUT
 
     if drive_speed != LAST_DRIVE_SPEED:
         # Drive Motors
@@ -61,50 +124,15 @@ def on_service_contact(data):
         # Steering Motors
 
         # Roboclaw 1
-        roboclaw.ForwardBackwardM1(steering_controller_4, calculate_wheel_angle(wheel_angle_input, WheelPosition.FRONT_LEFT))
-        roboclaw.ForwardBackwardM2(steering_controller_4, calculate_wheel_angle(wheel_angle_input, WheelPosition.FRONT_RIGHT))
+        roboclaw.ForwardBackwardM1(steering_controller_4, calculate_wheel_power(wheel_angle_input, WheelPosition.FRONT_LEFT))
+        roboclaw.ForwardBackwardM2(steering_controller_4, calculate_wheel_power(wheel_angle_input, WheelPosition.FRONT_RIGHT))
 
         # Roboclaw 2
-        roboclaw.ForwardBackwardM1(steering_controller_5, calculate_wheel_angle(wheel_angle_input, WheelPosition.BACK_LEFT))
-        roboclaw.ForwardBackwardM2(steering_controller_5, calculate_wheel_angle(wheel_angle_input, WheelPosition.BACK_RIGHT))
+        roboclaw.ForwardBackwardM1(steering_controller_5, calculate_wheel_power(wheel_angle_input, WheelPosition.BACK_LEFT))
+        roboclaw.ForwardBackwardM2(steering_controller_5, calculate_wheel_power(wheel_angle_input, WheelPosition.BACK_RIGHT))
 
     LAST_ANGLE_INPUT = wheel_angle_input
     LAST_DRIVE_SPEED = drive_speed
-
-    return DriveTrainServiceResponse("Request Executed Successfully")
-
-def init_node():
-    global roboclaw
-
-    roboclaw.Open()
-
-    # Create new node to act as the controller_Service
-    rospy.init_node("DriveTrainControllerNode")
-
-    # Create the service itself
-    service = rospy.Service("drive_train_controller", DriveTrainService, handler=on_service_contact)
-
-    # Used to distinguish output from a launch file
-    rospy.loginfo(f"{rospy.get_name()}: awaiting instruction...")
-
-    # Setup handlers
-    rospy.spin()
-
-
-
-def calculate_wheel_angle(value, wheelLocation):
-    selected_wheel = wheelLocation.value
-
-    # Remap the controller inputs to the turnRadius inputs, and update the 
-    turnRadius = controller_math.remapBounds(0, 1, 1, 10.4645, 1-abs(value))
-    controller_math.updateCircleRadius(turnRadius)
-
-    # Print out the angle for the given wheel
-    print(f"{wheelLocation.name} : {controller_math.getWheelAngle(selected_wheel)}")
-    return value
-
-if __name__ == "__main__":
-    init_node()
 
 class WheelPosition(Enum):
     """Enum to track which wheel we are calculating the angle for"""

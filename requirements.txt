@@ -6,3 +6,6 @@ smbus2
 
 # Adafruit PWM Library
 adafruit-circuitpython-servokit
+
+# PID Library
+simple-pid
