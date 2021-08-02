@@ -46,16 +46,16 @@ def on_service_contact(data):
         # Drive Motors
 
         # MCP 1
-        roboclaw.ForwardBackwardM1(drive_controller_1, drive_speed)
-        roboclaw.ForwardBackwardM2(drive_controller_1, drive_speed)
+        roboclaw.ForwardBackwardM1(drive_controller_1, controller_math.getNormalizedWheelSpeed(drive_speed, wheel_angle_input, WheelPosition.FRONT_LEFT))
+        roboclaw.ForwardBackwardM2(drive_controller_1, controller_math.getNormalizedWheelSpeed(drive_speed, wheel_angle_input, WheelPosition.FRONT_RIGHT))
         
         # MCP 2
-        roboclaw.ForwardBackwardM1(drive_controller_2, drive_speed)
-        roboclaw.ForwardBackwardM2(drive_controller_2, drive_speed)
+        roboclaw.ForwardBackwardM1(drive_controller_2, controller_math.getNormalizedWheelSpeed(drive_speed, wheel_angle_input, WheelPosition.MIDDLE_LEFT))
+        roboclaw.ForwardBackwardM2(drive_controller_2, controller_math.getNormalizedWheelSpeed(drive_speed, wheel_angle_input, WheelPosition.MIDDLE_RIGHT))
 
         # MCP 3
-        roboclaw.ForwardBackwardM1(drive_controller_3, drive_speed)
-        roboclaw.ForwardBackwardM2(drive_controller_3, drive_speed)
+        roboclaw.ForwardBackwardM1(drive_controller_3, controller_math.getNormalizedWheelSpeed(drive_speed, wheel_angle_input, WheelPosition.BACK_LEFT))
+        roboclaw.ForwardBackwardM2(drive_controller_3, controller_math.getNormalizedWheelSpeed(drive_speed, wheel_angle_input, WheelPosition.BACK_RIGHT))
 
     if wheel_angle_input != LAST_ANGLE_INPUT:
         # Steering Motors
@@ -90,21 +90,18 @@ def init_node():
     # Setup handlers
     rospy.spin()
 
-def unit_range_to_controller(value):
-    """Convert from -1 to 1 to 0 to 127 with 64 in the middle to accommodate the motor controller values"""
-    if value >= 0:
-        if 64 + abs(round(value * 64)) > 127:
-            return 127
-        return (64 + abs(round(value * 64)))
-    else:
-        return (64 - abs(round(value * 64)))
+
 
 def calculate_wheel_angle(value, wheelLocation):
     selected_wheel = wheelLocation.value
 
+    # Remap the controller inputs to the turnRadius inputs, and update the 
+    turnRadius = controller_math.remapBounds(0, 1, 1, 10.4645, 1-abs(value))
+    controller_math.updateCircleRadius(turnRadius)
+
     # Print out the angle for the given wheel
     print(f"{wheelLocation.name} : {controller_math.getWheelAngle(selected_wheel)}")
-    return input
+    return value
 
 if __name__ == "__main__":
     init_node()
@@ -115,3 +112,5 @@ class WheelPosition(Enum):
     FRONT_RIGHT = 1
     BACK_LEFT = 2
     BACK_RIGHT = 3
+    MIDDLE_RIGHT = 4
+    MIDDLE_LEFT = 5

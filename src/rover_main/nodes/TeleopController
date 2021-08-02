@@ -20,7 +20,7 @@ CONTROLLER_DEADZONE = 0.05
 def create_controller_deadzone(input):
     """Create a slight deadzone so that you can easily stop the motors (A standard foreach loop wasn't working here)"""
 
-    if(input <  0 + CONTROLLER_DEADZONE and input > 0 - CONTROLLER_DEADZONE):
+    if(abs(input) < CONTROLLER_DEADZONE):
         input = 0
     
     return input
